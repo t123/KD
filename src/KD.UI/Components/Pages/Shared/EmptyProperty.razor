@@ -1,0 +1,30 @@
+﻿@using KD.Infrastructure.ViewModels.Properties
+
+@{
+    if(ViewModel is EmptyPropertyViewModel)
+    {
+        <span>Empty</span>
+        <span>@ViewModel.Created</span>
+        <span>@ViewModel.Name</span>
+        <span>@ViewModel.Uid</span>
+    }
+    else if(ViewModel!=null)
+    {
+        <span>Not Implemented</span>
+        <span>@ViewModel.Created</span>
+        <span>@ViewModel.Name</span>
+        <span>@ViewModel.Uid</span>
+    }
+    else
+    {
+        <span>Unknown</span>
+    }
+}
+
+@code {
+    [Parameter]
+    public required PropertyViewState State { get; set; }
+
+    [Parameter]
+    public required IPropertyViewModel ViewModel { get; set; }
+}

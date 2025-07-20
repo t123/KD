@@ -1,0 +1,13 @@
+﻿@using Humanizer
+<MudElement>
+    @if(Date.HasValue) 
+    {
+        <MudTooltip Text="@Date.Value.ToString()">
+            @Date.Humanize()
+        </MudTooltip>
+    }
+</MudElement>
+@code {
+    [Parameter]
+    public DateTime? Date { get; set; }
+}

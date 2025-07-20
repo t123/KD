@@ -1,5 +1,5 @@
 ﻿/*#if (SampleContent)*/
-html, body {
+/*html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -19,10 +19,10 @@ a, .btn-link {
 
 .content {
     padding-top: 1.1rem;
-}
+}*/
 
 /*#endif*/
-h1:focus {
+/*h1:focus {
     outline: none;
 }
 
@@ -36,6 +36,43 @@ h1:focus {
 
 .validation-message {
     color: #e50000;
+}*/
+
+:root {
+    --mud-appbar-height: 0 !important;
+}
+
+aside.width25 {
+    width: 25% !important;
+}
+
+aside.width50 {
+    width: 50% !important;
+}
+
+.rotate45 {
+    transform: rotate(45deg)
+}
+
+.kd-genericview .mud-icon-button {
+    padding: 0;
+}
+
+.kd-genericview-header .kd-mud-grid {
+    padding: 0 0 20px 0;
+} 
+
+.kd-yaml-editor {
+    width: 80%;
+    height: 800px;
+}
+
+    .kd-yaml-editor .monaco-editor-container {
+        height: 100%
+    }
+
+.kd-tab-navigation .mud-tabs-header-after {
+    display: none !important;
 }
 
 #blazor-error-ui {

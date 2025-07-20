@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KD.UI", "KD.UI\KD.UI.csproj", "{78817E83-10B0-4BB2-B1B5-851C5C5063E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KD.Infrastructure", "KD.Infrastructure\KD.Infrastructure.csproj", "{C9381BDA-E6CE-4154-8189-7229CE2426FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{78817E83-10B0-4BB2-B1B5-851C5C5063E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78817E83-10B0-4BB2-B1B5-851C5C5063E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78817E83-10B0-4BB2-B1B5-851C5C5063E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9381BDA-E6CE-4154-8189-7229CE2426FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9381BDA-E6CE-4154-8189-7229CE2426FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9381BDA-E6CE-4154-8189-7229CE2426FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9381BDA-E6CE-4154-8189-7229CE2426FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39BCB942-D0D5-4B08-9FC6-FFAF45528609}
 	EndGlobalSection
 EndGlobal

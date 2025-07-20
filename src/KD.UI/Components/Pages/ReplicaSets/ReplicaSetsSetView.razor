@@ -1,0 +1,71 @@
+﻿@using KD.Infrastructure.ViewModels.Objects
+@implements IAsyncDisposable
+@inherits FluxorComponent
+
+@if (!ReplicaSetState.Value.IsLoading)
+{
+    if (ReplicaSetState.Value.TabMapping.ContainsKey(Tab))
+    {
+        var itemsView = ReplicaSetState.Value.TabMapping[Tab];
+        <GenericViewHeader Label="Replica Sets" LastUpdate="@itemsView.LastUpdate">
+        </GenericViewHeader>
+        <MudDataGrid Items="@(itemsView.Items)" Filterable="true" SortMode="@SortMode.Single" Groupable="false" T="ReplicaSetViewModel" Dense="true">
+            <Columns>
+                <TemplateColumn Title="Name">
+                    <CellTemplate>
+                        <a onclick="@(() => NameClick(context.Item))">@context.Item.Name</a>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.Created" />
+                <PropertyColumn Property="p => p.Replicas" />
+                <PropertyColumn Property="p => p.ReadyReplicas" />
+                <PropertyColumn Property="p => p.AvailableReplicas" />
+                <PropertyColumn Property="p => p.TerminatingReplicas" />
+            </Columns>
+        </MudDataGrid>
+    }
+}
+else
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+
+@code {
+    private bool IsDisposed;
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+
+    [Inject]
+    public IState<ReplicaSetViewState> ReplicaSetState { get; set; }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    private void NameClick(ReplicaSetViewModel viewModel)
+    {
+        Dispatcher.Dispatch(new OpenPropertiesAction(viewModel, ObjectType.ReplicaSet, Tab, CancellationTokenSource.Token));
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesReplicaSetAction(Tab, CancellationTokenSource.Token));
+    }
+
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                CancellationTokenSource.Cancel();
+            }
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}

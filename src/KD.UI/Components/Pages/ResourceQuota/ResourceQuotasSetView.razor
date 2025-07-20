@@ -1,0 +1,67 @@
+﻿@using KD.Infrastructure.ViewModels.Objects
+@implements IAsyncDisposable
+@inherits FluxorComponent
+
+@if (!ResourceQuotaState.Value.IsLoading)
+{
+    if (ResourceQuotaState.Value.TabMapping.ContainsKey(Tab))
+    {
+        var dameonSetView = ResourceQuotaState.Value.TabMapping[Tab];
+        <GenericViewHeader Label="Deployments" LastUpdate="@dameonSetView.LastUpdate">
+        </GenericViewHeader>
+        <MudDataGrid Items="@(dameonSetView.Items)" Filterable="true" SortMode="@SortMode.Single" Groupable="false" T="ResourceQuotaViewModel" Dense="true">
+            <Columns>
+                <TemplateColumn Title="Name">
+                    <CellTemplate>
+                        <a onclick="@(() => NameClick(context.Item))">@context.Item.Name</a>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.Created" />
+            </Columns>
+        </MudDataGrid>
+    }
+}
+else
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+
+@code {
+    private bool IsDisposed;
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+
+    [Inject]
+    public IState<ResourceQuotaViewState> ResourceQuotaState { get; set; }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    private void NameClick(ResourceQuotaViewModel viewModel)
+    {
+        Dispatcher.Dispatch(new OpenPropertiesAction(viewModel, ObjectType.ResourceQuota, Tab, CancellationTokenSource.Token));
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesResourceQuotaAction(Tab, CancellationTokenSource.Token));
+    }
+
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                CancellationTokenSource.Cancel();
+            }
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}

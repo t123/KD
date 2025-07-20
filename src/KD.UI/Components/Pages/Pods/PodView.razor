@@ -1,0 +1,221 @@
+﻿@using KD.Infrastructure.ViewModels.Objects
+@implements IAsyncDisposable
+@inherits FluxorComponent
+@inject IJSRuntime jsRuntime
+
+<div class="kd-genericview">
+    @if (!PodState.Value.IsLoading)
+    {
+        if (PodState.Value.TabMapping.ContainsKey(Tab))
+        {
+            var podView = PodState.Value.TabMapping[Tab];
+            var pods = podView.Items.AsQueryable();
+
+            if (SelectedNamespaces.Count() > 0)
+            {
+                pods = pods.Where(x => SelectedNamespaces.Contains(x.Namespace.ToUpperInvariant()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                pods = pods.Where(x => x.Name.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            pods = pods.OrderBy(x => x.Name);
+
+            <GenericViewHeader Label="Pods" LastUpdate="@podView.LastUpdate" OnRefresh="Refresh" OnSearch="Search">
+                <MudItem>
+                    <MudSwitch T="bool" Label="Init Containers?" @bind-Value="ShowInitContainers"></MudSwitch>
+                </MudItem>
+                <MudItem>
+                    <MudSelect T="string" Label="Namespaces" MultiSelection="true" @bind-SelectedValues="SelectedNamespaces">
+                        @foreach (var ns in Namespaces)
+                        {
+                            <MudSelectItem T="string" Value="@ns.ToUpperInvariant()">
+                                <MudIcon Icon="@Icons.Material.Outlined.Star" Color="Color.Primary" />
+                                @ns
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </GenericViewHeader>
+            <MudDataGrid Items="pods" Filterable="true" SortMode="@SortMode.Single" Groupable="false" T="PodViewModel"  RowContextMenuClick="ContextMenuClick">
+                <Columns>
+                    <PropertyColumn Property="p => p.Name" />
+                    <PropertyColumn Property="p => p.Namespace" />
+                    <TemplateColumn Title="Containers">
+                        <CellTemplate>
+                            <MudStack Spacing="0" Row=true Justify="Justify.FlexStart">
+                                @foreach (var container in context.Item.Containers.OrderBy(x => x.State).ThenBy(x => x.Name))
+                                {
+                                    string title = $"{container.Name} - {container.State}";
+
+                                    switch (container.State)
+                                    {
+                                        case ContainerViewModel.ContainerState.Running:
+                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleUp" Color="Color.Success" OnClick="@((e) => ContainerClick(context.Item))" />
+                                            break;
+
+                                        case ContainerViewModel.ContainerState.Terminated:
+                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@title" Color="Color.Error" />
+                                            break;
+
+                                        case ContainerViewModel.ContainerState.Waiting:
+                                            <MudIconButton Icon="@Icons.Material.Filled.ChangeCircle" Title="@title" />
+                                            break;
+
+                                        default:
+                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@title" />
+                                            break;
+                                    }
+                                }
+                                @if (ShowInitContainers && context.Item.InitContainers.Any())
+                                {
+                                    <MudDivider Vertical=true FlexItem=true></MudDivider>
+                                    @foreach (var container in context.Item.InitContainers.OrderBy(x => x.State).ThenBy(x => x.Name))
+                                    {
+                                        string title = $"{container.Name} - {container.State}";
+
+                                        switch (container.State)
+                                        {
+                                            case ContainerViewModel.ContainerState.Running:
+                                                <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleUp" Title="@title" Color="Color.Success" OnClick="@((e) => ContainerClick(context.Item))" />
+                                                break;
+
+                                            case ContainerViewModel.ContainerState.Terminated:
+                                                <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@title" Color="Color.Error" />
+                                                break;
+
+                                            case ContainerViewModel.ContainerState.Waiting:
+                                                <MudIconButton Icon="@Icons.Material.Filled.ChangeCircle" Title="@title" />
+                                                break;
+
+                                            default:
+                                                <MudIconButton Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@title" />
+                                                break;
+                                        }
+                                    }
+                                }
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Restarts">
+                        <CellTemplate>
+                            @context.Item.Containers.Sum(x => x.RestartCount)
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="p => p.Phase" />
+                    <PropertyColumn Property="p => p.NodeName" />
+                    <TemplateColumn Title="Ready At">
+                        <CellTemplate>
+                            <TagDate Date="@context.Item.ReadyAt"></TagDate>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Created">
+                        <CellTemplate>
+                            <TagDate Date="@context.Item.Created"></TagDate>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Filled.ReadMore" Color="Color.Success" OnClick="@((e) => ContainerClick(context.Item))" />
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+            <MudMenu @ref="_contextMenu" PositionAtCursor="true">
+                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(ContextRow.Name)">Copy @ContextRow.Name</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(ContextRow.Namespace)">Copy @ContextRow.Namespace</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="(e) => OpenEditor(Tab, ContextRow.Name, ContextRow.Namespace)">Edit @ContextRow.Name</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error">Delete @ContextRow.Name</MudMenuItem>
+            </MudMenu>
+        }
+    }
+    else
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+</div>
+
+@code {
+    private bool IsDisposed;
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+    private bool ShowInitContainers { get; set; } = true;
+    private IEnumerable<string> SelectedNamespaces = new List<string>();
+    private string[] Namespaces { get; set; } = [];
+    private string SearchText { get; set; }
+    private MudMenu _contextMenu;
+    private PodViewModel ContextRow;
+
+    [Inject]
+    public IState<PodViewState> PodState { get; set; }
+    [Inject]
+    public IState<PropertyViewState> PropertyState { get; set; }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        SubscribeToAction<FetchKubernetesNamespaceActionResult>(Callback);
+
+        Dispatcher.Dispatch(new FetchKubernetesPodAction(Tab, CancellationTokenSource.Token));
+        Dispatcher.Dispatch(new FetchKubernetesNamespaceAction(Tab, CancellationTokenSource.Token));
+    }
+
+    private async Task ContextMenuClick(DataGridRowClickEventArgs<PodViewModel> args)
+    {
+        ContextRow = args.Item;
+        await _contextMenu.OpenMenuAsync(args.MouseEventArgs);
+    }
+
+    private void ContainerClick(PodViewModel viewModel)
+    {
+        Dispatcher.Dispatch(new OpenPropertiesAction(viewModel, ObjectType.Pod, Tab, CancellationTokenSource.Token));
+    }
+
+    private void Callback(FetchKubernetesNamespaceActionResult e)
+    {
+        Namespaces = e.Items.Select(ns => ns.Name).OrderBy(x => x).ToArray();
+    }
+
+    private async Task Refresh()
+    {
+        Dispatcher.Dispatch(new FetchKubernetesPodAction(Tab, CancellationTokenSource.Token));
+    }
+
+    private async Task Search(string s)
+    {
+        SearchText = s;
+    }
+
+    private async Task OpenEditor(Tab tab, string name, string ns)
+    {
+        Dispatcher.Dispatch(new OpenEditorAction(tab, name, ns));
+    }
+
+    private async Task CopyToClipboard(string name)
+    {
+        await jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", name);
+    }
+
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                CancellationTokenSource.Cancel();
+            }
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}
