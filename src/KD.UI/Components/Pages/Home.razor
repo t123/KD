@@ -1,10 +1,41 @@
-﻿@page "/"
+﻿@inherits FluxorComponent
+@page "/"
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
 
-<h1>Hello, world!</h1>
+<MudDrawer Open="true" Anchor="Anchor.Left" Variant="DrawerVariant.Persistent">
+    <ConfigNavigation />
+    <ContextNavigation />
+    <ObjectNavigation />
+</MudDrawer>
+<GenericPropertyNavigation />
+<MudMainContent>
+    <Search />
+    <YamlEditor />
+    <MudStack Row="false">
+        <MudStack Row=true Justify="Justify.FlexStart" AlignItems="AlignItems.Start" StretchItems="StretchItems.None" Wrap="Wrap.NoWrap">
+            <MudGrid>
+                <MudItem xs="11">
+                    <TabContextSelection />
+                </MudItem>
+                <MudItem xs="1" Class="align-self-end">
+                    <MudIconButton ButtonType="ButtonType.Button" Icon="@Icons.Material.Filled.Search" OnClick="Search"/>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
+        <MudElement>
+            <TabNavigation />
+        </MudElement>
+    </MudStack>
+</MudMainContent>
 
-Welcome to your new app.
+@code {
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
 
-<FluentCard>
-    <h2>Hello World!</h2>
-    <FluentButton Appearance="@Appearance.Accent">Click Me</FluentButton>
-</FluentCard>
+    private void Search(MouseEventArgs args)
+    {
+        Dispatcher.Dispatch(new OpenSearchAction());
+    }
+}

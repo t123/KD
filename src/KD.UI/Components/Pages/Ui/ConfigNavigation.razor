@@ -1,0 +1,27 @@
+﻿@inherits FluxorComponent
+
+<MudElement Class="flex-grow-0">
+    @if (!ConfigState.Value.IsLoading)
+    {
+        <MudSelect T="string">
+            @foreach (var config in ConfigState.Value.Configs)
+            {
+                <MudSelectItem T="string">@config.Name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+</MudElement>
+
+@code {
+    [Inject]
+    public IState<KubernetesConfigState> ConfigState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesConfigAction());
+    }
+}

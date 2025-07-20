@@ -1,0 +1,16 @@
+﻿@using KD.Infrastructure.ViewModels.Properties
+@inherits FluxorComponent
+
+<MudStack>
+    <MudText>@ViewModel.Name</MudText>
+    <MudText>@ViewModel.Uid</MudText>
+    <MudText>@ViewModel.Created</MudText>
+</MudStack>
+
+@code {
+    [Parameter]
+    public required PropertyViewState State { get; set; }
+
+    [Parameter]
+    public required IngressPropertyViewModel ViewModel { get; set; }
+}

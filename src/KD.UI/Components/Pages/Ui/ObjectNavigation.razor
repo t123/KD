@@ -1,0 +1,114 @@
+﻿@inherits FluxorComponent
+
+<MudList T="string" Dense="true">
+    @{
+        var favourites = ObjectNavigationState.Value.Flattened.Where(x => x.IsFavourite).OrderBy(x => x.Name);
+
+        if (favourites.Count() > 0)
+        {
+            <MudListItem Expanded="true" Text="Favourites" Class="mud-info-hover">
+                <NestedList>
+                    @foreach (var item in favourites)
+                    {
+                        <MudListItem>
+                            <ChildContent>
+                                <div class="d-flex">
+                                    <MudElement Style="width:100%">
+                                        <MudLink OnClick="@((e) => AddTab(item.Action))" Typo="Typo.body2" Color="Color.Default" Class="mud-palette-text-secondary" Underline="Underline.None" Style="display:inline-block; width:100%">@item.Name</MudLink>
+                                    </MudElement>
+                                    <MudIconButton Icon="@Icons.Material.Filled.PushPin" Size="Size.Small" Color="Color.Error" OnClick="@((e) => RemoveFavourite(item.Id))" Class="ml-auto rotate45"></MudIconButton>
+                                </div>
+                            </ChildContent>
+                        </MudListItem>
+                    }
+                </NestedList>
+            </MudListItem>
+            <MudDivider />
+        }
+
+        foreach (var topLevel in ObjectNavigationState.Value.Items)
+        {
+            if (topLevel.Items == null)
+            {
+                <MudListItem>
+                    <ChildContent>
+                        <div class="d-flex">
+                            <MudElement Style="width:100%">
+                                <MudLink OnClick="@((e) => AddTab(topLevel.Action))" Typo="Typo.body2" Color="Color.Default" Class="mud-palette-text-secondary" Underline="Underline.None" Style="display:inline-block; width:100%">@topLevel.Name</MudLink>
+                            </MudElement>
+                            @if (!topLevel.IsFavourite)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Size="Size.Small" Color="Color.Info" OnClick="@((e) => AddFavourite(topLevel.Id))" Class="ml-auto"></MudIconButton>
+                            }
+                        </div>
+                    </ChildContent>
+                </MudListItem>
+            }
+            else
+            {
+                <MudListItem Expanded="false" Text="@topLevel.Name" Class="mud-info-hover">
+                    <NestedList>
+                        @foreach (var item in topLevel.Items)
+                        {
+                            <MudListItem>
+                                <ChildContent>
+                                    <div class="d-flex">
+                                        <MudElement Style="width:100%">
+                                            <MudLink OnClick="@((e) => AddTab(item.Action))" Typo="Typo.body2" Color="Color.Default" Class="mud-palette-text-secondary" Underline="Underline.None" Style="display:inline-block; width:100%">@item.Name</MudLink>
+                                        </MudElement>
+                                        @if (!item.IsFavourite)
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Outlined.PushPin" Size="Size.Small" Color="Color.Info" OnClick="@((e) => AddFavourite(item.Id))" Class="ml-auto"></MudIconButton>
+                                        }
+                                    </div>
+                                </ChildContent>
+                            </MudListItem>
+                        }
+                    </NestedList>
+                </MudListItem>
+            }
+        }
+    }
+</MudList>
+
+@code {
+    private GenericView? _genericView;
+
+    [Inject]
+    public IState<TabState> TabState { get; set; }
+
+    [Inject]
+    public IState<ObjectNavigationState> ObjectNavigationState { get; set; }
+
+    [Inject]
+    public IState<KubernetesContextState> ContextState { get; set; }
+
+    [Inject]
+    public IState<KubernetesConfigState> ConfigState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void AddFavourite(string id)
+    {
+        Dispatcher.Dispatch(new ObjectNavigationAddFavouriteAction(id));
+    }
+
+    private void RemoveFavourite(string id)
+    {
+        Dispatcher.Dispatch(new ObjectNavigationRemoveFavouriteAction(id));
+    }
+
+    private void AddTab(string objectViewType)
+    {
+        if (ConfigState.Value.CurrentConfig == null) return;
+        if (ContextState.Value.CurrentContext == null) return;
+
+        Dispatcher.Dispatch(new AddTabAction(ConfigState.Value.CurrentConfig, ContextState.Value.CurrentContext, objectViewType));
+    }
+}

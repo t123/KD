@@ -1,0 +1,95 @@
+﻿@using KD.Infrastructure.ViewModels.Objects
+@implements IAsyncDisposable
+@inherits FluxorComponent
+
+@if (!ServiceState.Value.IsLoading)
+{
+    if (ServiceState.Value.TabMapping.ContainsKey(Tab))
+    {
+        var serviceView = ServiceState.Value.TabMapping[Tab];
+        <MudElement>
+            @(serviceView.LastUpdate?.ToLongTimeString() ?? "No update")
+        </MudElement>
+        <MudDataGrid Items="@(serviceView.Items)" Filterable="true" SortMode="@SortMode.Single" Groupable="false" T="ServiceViewModel" Dense="true" RowContextMenuClick="ContextMenuClick" RowClick="RowClick">
+            <Columns>
+                <PropertyColumn Property="p => p.Name" />
+                <PropertyColumn Property="p => p.Namespace" />
+                <PropertyColumn Property="p => p.Type" />
+                <PropertyColumn Property="p => p.ClusterIp" />
+                <TemplateColumn Title="Internal Endpoints">
+                    <CellTemplate>
+                        @foreach(var endpoint in context.Item.InternalEndpoints)
+                        {
+                            <div>@endpoint</div>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="External Endpoints">
+                    <CellTemplate>
+                        @foreach (var endpoint in context.Item.ExternalEndpoints)
+                        {
+                            <div>@endpoint</div>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.Created" />
+            </Columns>
+        </MudDataGrid>
+        <MudMenu @ref="_contextMenu" PositionAtCursor="true">
+            <MudMenuItem>Test 1</MudMenuItem>
+            <MudMenuItem>Test 2</MudMenuItem>
+            <MudMenuItem>Test 3</MudMenuItem>
+            <MudMenuItem>Test 4</MudMenuItem>
+        </MudMenu>
+    }
+}
+else
+{
+    <MudProgressCircular Indeterminate="true"/>
+}
+
+@code {
+    private bool IsDisposed;
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+    private MudMenu _contextMenu;
+
+    [Inject]
+    public IState<ServiceViewState> ServiceState { get; set; }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesServiceAction(Tab, CancellationTokenSource.Token));
+    }
+
+    private async Task ContextMenuClick(DataGridRowClickEventArgs<ServiceViewModel> e)
+    {
+        await _contextMenu.OpenMenuAsync(e.MouseEventArgs);
+    }
+
+    private async Task RowClick(DataGridRowClickEventArgs<ServiceViewModel> row)
+    {
+        Dispatcher.Dispatch(new OpenPropertiesAction(row.Item, ObjectType.Service, Tab, CancellationTokenSource.Token));
+    }
+
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                CancellationTokenSource.Cancel();
+            }
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}

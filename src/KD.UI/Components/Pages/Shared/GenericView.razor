@@ -1,0 +1,70 @@
+﻿<DynamicComponent @ref="dc" Type="SelectedType" Parameters="@Parameters" />
+
+@code {
+    Type? SelectedType
+    {
+        get
+        {
+            if (components.TryGetValue(Tab.ObjectViewType, out var type))
+            {
+                return type;
+            }
+
+            return typeof(EmptyView);
+        }
+    }
+
+    private DynamicComponent? dc;
+
+    readonly Dictionary<string, Type> components = new()
+    {
+        [ObjectType.Pod] = typeof(KD.UI.Components.Pages.Pods.PodView),
+        [ObjectType.Namespace] = typeof(KD.UI.Components.Pages.Namespaces.NamespaceView),
+        [ObjectType.Ingress] = typeof(KD.UI.Components.Pages.Ingresses.IngressView),
+        [ObjectType.Deployment] = typeof(KD.UI.Components.Pages.Deployments.DeploymentView),
+        [ObjectType.Service] = typeof(KD.UI.Components.Pages.Services.ServiceView),
+        [ObjectType.Endpoint] = typeof(KD.UI.Components.Pages.Endpoints.EndpointView),
+        [ObjectType.Job] = typeof(KD.UI.Components.Pages.Jobs.JobsSetView),
+        [ObjectType.CronJob] = typeof(KD.UI.Components.Pages.CronJobs.CronJobsSetView),
+        [ObjectType.DaemonSet] = typeof(KD.UI.Components.Pages.DaemonSets.DaemonSetView),
+        [ObjectType.StatefulSet] = typeof(KD.UI.Components.Pages.StatefulSets.StatefulSetsSetView),
+        [ObjectType.ReplicaSet] = typeof(KD.UI.Components.Pages.ReplicaSets.ReplicaSetsSetView),
+        [ObjectType.ReplicationController] = typeof(KD.UI.Components.Pages.ReplicationController.ReplicationControllersSetView),
+        [ObjectType.ConfigMap] = typeof(KD.UI.Components.Pages.ConfigMaps.ConfigMapsSetView),
+        [ObjectType.Secret] = typeof(KD.UI.Components.Pages.Secrets.SecretsSetView),
+        [ObjectType.ResourceQuota] = typeof(KD.UI.Components.Pages.ResourceQuota.ResourceQuotasSetView),
+        [ObjectType.HorizontalPodAutoscaler] = typeof(KD.UI.Components.Pages.HorizontalPodAutoscaler.HorizontalPodAutoscalersSetView),
+        [ObjectType.PodDisruptionBudget] = typeof(KD.UI.Components.Pages.PodDisruptionBudget.PodDisruptionBudgetsSetView),
+        [ObjectType.PriorityClass] = typeof(KD.UI.Components.Pages.PriorityClass.PriorityClassesSetView),
+        [ObjectType.RuntimeClass] = typeof(KD.UI.Components.Pages.RuntimeClass.RuntimeClassesSetView),
+        [ObjectType.Lease] = typeof(KD.UI.Components.Pages.Leases.LeasesSetView),
+        [ObjectType.MutatingWebhookConfiguration] = typeof(KD.UI.Components.Pages.MutatingWebhookConfigurations.MutatingWebhookConfigurationsSetView),
+        [ObjectType.ValidatingWebhookConfiguration] = typeof(KD.UI.Components.Pages.ValidatingWebhookConfigurations.ValidatingWebhookConfigurationsSetView),
+        [ObjectType.IngressClass] = typeof(KD.UI.Components.Pages.IngressClass.IngressClassesSetView),
+        [ObjectType.NetworkPolicy] = typeof(KD.UI.Components.Pages.NetworkPolicies.NetworkPoliciesSetView),
+        //[ObjectType.PortForwarding] = typeof(KD.UI.Components.Pages.CronJobs.CronJobsSetView),
+        [ObjectType.PersistentVolumeClaim] = typeof(KD.UI.Components.Pages.PersistentVolumeClaims.PersistentVolumeClaimsSetView),
+        [ObjectType.PersistentVolume] = typeof(KD.UI.Components.Pages.PersistentVolumes.PersistentVolumesSetView),
+        [ObjectType.StorageClass] = typeof(KD.UI.Components.Pages.StorageClass.StorageClassesSetView),
+        [ObjectType.Event] = typeof(KD.UI.Components.Pages.Events.EventsSetView),
+        [ObjectType.ServiceAccount] = typeof(KD.UI.Components.Pages.ServiceAccounts.ServiceAccountsSetView),
+        [ObjectType.ClusterRole] = typeof(KD.UI.Components.Pages.ClusterRoles.ClusterRolesSetView),
+        [ObjectType.Role] = typeof(KD.UI.Components.Pages.Roles.RolesSetView),
+        [ObjectType.ClusterRoleBinding] = typeof(KD.UI.Components.Pages.ClusterRoleBindings.ClusterRoleBindingsSetView),
+        [ObjectType.RoleBinding] = typeof(KD.UI.Components.Pages.RoleBindings.RoleBindingsSetView),
+        [ObjectType.CustomResourcesDefinition] = typeof(KD.UI.Components.Pages.CustomResourcesDefinitions.CustomResourcesDefinitionsSetView),
+    };
+
+    Dictionary<string, object> Parameters
+    {
+        get
+        {
+            var d = new Dictionary<string, object>();
+            d.Add("Tab", Tab);
+            return d;
+        }
+    }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+}

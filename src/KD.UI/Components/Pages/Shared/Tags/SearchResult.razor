@@ -1,0 +1,16 @@
+﻿@inject ContextsManager contextsManager;
+
+@{
+    string name = Result.Values["Name"] ?? "";
+    var context = contextsManager.FindContext(Result.IndexType);
+}
+
+<MudPaper Width="100%" Style="padding-left: 30px">
+    <MudText Typo="Typo.body1"><strong>@name</strong></MudText>
+    <MudText Typo="Typo.body2" Color="@Colour.ToMudBlazor(context?.Colour)">@(context?.Name ?? Result.IndexType)</MudText>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public required KD.Infrastructure.SearchResult Result { get; set; }
+}

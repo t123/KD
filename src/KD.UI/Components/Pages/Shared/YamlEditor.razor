@@ -1,0 +1,54 @@
+﻿@inherits FluxorComponent
+@inject IJSRuntime jsRuntime
+
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
+
+<MudPopover @bind-Open="EditorState.Value.IsOpen" Fixed="true" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" Class="kd-yaml-editor">
+    <MudButton OnClick="CloseEditor">Close</MudButton>
+    <MudElement HtmlTag="div" Style="height: 100%;">
+        @if (EditorState.Value.IsOpen)
+        {
+            <StandaloneCodeEditor @ref="_standaloneCodeEditor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnDidInit"></StandaloneCodeEditor>
+        }
+    </MudElement>
+</MudPopover>
+
+@code {
+    private StandaloneCodeEditor _standaloneCodeEditor;
+
+    [Inject]
+    private IState<EditorViewState> EditorState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private async Task OnDidInit()
+    {
+        if (_standaloneCodeEditor != null)
+        {
+            await BlazorMonaco.Editor.Global.SetTheme(jsRuntime, "vs-dark");
+            await _standaloneCodeEditor.SetValue(EditorState.Value.Yaml);
+        }
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "yaml"
+        };
+    }
+
+    private async Task CloseEditor(MouseEventArgs e)
+    {
+        Dispatcher.Dispatch(new CloseEditorAction());
+    }
+}

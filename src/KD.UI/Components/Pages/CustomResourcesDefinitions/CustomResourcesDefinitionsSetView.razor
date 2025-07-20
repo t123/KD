@@ -1,0 +1,77 @@
+﻿@using KD.Infrastructure.ViewModels.Objects
+@implements IAsyncDisposable
+@inherits FluxorComponent
+
+@if (!CustomResourcesDefinitionState.Value.IsLoading)
+{
+    if (CustomResourcesDefinitionState.Value.TabMapping.ContainsKey(Tab))
+    {
+        var itemsView = CustomResourcesDefinitionState.Value.TabMapping[Tab];
+        <GenericViewHeader Label="Custom Resources Definition" LastUpdate="@itemsView.LastUpdate">
+        </GenericViewHeader>
+        <MudDataGrid Items="@(itemsView.Items)" Filterable="true" SortMode="@SortMode.Single" Groupable="false" T="CustomResourcesDefinitionViewModel" Dense="true">
+            <Columns>
+                <TemplateColumn Title="Name">
+                    <CellTemplate>
+                        <a onclick="@(() => NameClick(context.Item))">@context.Item.Name</a>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.Created" />
+                <PropertyColumn Property="p => p.Group" />
+                <TemplateColumn Title="Versions">
+                    <CellTemplate>
+                        @foreach (var version in context.Item.Versions)
+                        {
+                            <div>@version</div>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.Scope" />
+            </Columns>
+        </MudDataGrid>
+    }
+}
+else
+{
+    <MudProgressCircular Indeterminate="true" />
+}
+
+@code {
+    private bool IsDisposed;
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+
+    [Inject]
+    public IState<CustomResourcesDefinitionViewState> CustomResourcesDefinitionState { get; set; }
+
+    [Parameter]
+    public required Tab Tab { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    private void NameClick(CustomResourcesDefinitionViewModel viewModel)
+    {
+        Dispatcher.Dispatch(new OpenPropertiesAction(viewModel, ObjectType.CustomResourcesDefinition, Tab, CancellationTokenSource.Token));
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesCustomResourcesDefinitionAction(Tab, CancellationTokenSource.Token));
+    }
+
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+
+            if (disposing)
+            {
+                CancellationTokenSource.Cancel();
+            }
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}

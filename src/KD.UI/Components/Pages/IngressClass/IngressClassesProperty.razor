@@ -1,0 +1,18 @@
+﻿@using KD.Infrastructure.ViewModels.Properties
+@inherits FluxorComponent
+
+<MudStack>
+    <MudNavLink>yyyyyy</MudNavLink>
+    <MudNavLink>yyyyyy</MudNavLink>
+    <MudNavLink>yyyyyy</MudNavLink>
+    <MudNavLink>yyyyyy</MudNavLink>
+    <MudNavLink>yyyyyy</MudNavLink>
+</MudStack>
+
+@code {
+    [Parameter]
+    public required PropertyViewState State { get; set; }
+
+    [Parameter]
+    public required DameonSetPropertyViewModel? ViewModel { get; set; }
+}

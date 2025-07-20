@@ -1,0 +1,67 @@
+﻿@inherits FluxorComponent
+
+<MudTabs @ref="mudTabs">
+    @if (!ContextState.Value.IsLoading)
+    {
+        foreach (var context in ContextState.Value.UserOrderedContexts)
+        {
+            <MudTabPanel
+                ID="@context"
+                Text="@context.Name"
+                BadgeData='string.Empty'
+                BadgeDot="true"
+                BadgeColor="@Colour.ToMudBlazor(context.Colour)"
+                OnClick="args => TabSelected(args, context)"
+            >
+            </MudTabPanel>
+        }
+    }
+</MudTabs>
+
+@code {
+    [Inject]
+    public IState<KubernetesContextState> ContextState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    private MudTabs mudTabs;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesContextAction());
+
+        SubscribeToAction<ChangeKubernetesContextActionResult>(Callback);
+    }
+
+    private void Callback(ChangeKubernetesContextActionResult e)
+    {
+        if (e.Context == null)
+        {
+            return;
+        }
+
+        if (mudTabs.ActivePanel?.ID as Context == e.Context)
+        {
+            return;
+        }
+
+        var panel = mudTabs.Panels.SingleOrDefault(x => x?.ID as Context == e.Context);
+
+        if (panel != null)
+        {
+            mudTabs.ActivatePanel(panel);
+        }
+    }
+
+    private void OnValueChanged(Context context)
+    {
+        Dispatcher.Dispatch(new ChangeKubernetesContextAction(context));
+    }
+
+    private void TabSelected(MouseEventArgs eventArg, Context context)
+    {
+        Dispatcher.Dispatch(new ChangeKubernetesContextAction(context));
+    }
+}
