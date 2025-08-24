@@ -1,0 +1,18 @@
+﻿@inherits BaseView
+
+@if (!State.Value.IsLoading)
+{
+    if (State.Value.TabMapping.ContainsKey(Tab))
+    {
+        var view = State.Value.TabMapping[Tab];
+        var items = view.Items.AsQueryable();
+
+        <ul>
+            @foreach (var item in items)
+            {
+                <li>@item.Name</li>
+            }
+        </ul>
+    }
+}
+

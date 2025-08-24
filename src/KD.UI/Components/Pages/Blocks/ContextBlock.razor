@@ -1,0 +1,39 @@
+﻿@inherits FluxorComponent
+
+<MudElement Class="flex-grow-0">
+    @if (!ContextState.Value.IsLoading)
+    {
+        <MudSelect T="Context" Value="@ContextState.Value.CurrentContext" ValueChanged="OnValueChanged">
+            @foreach (var context in ContextState.Value.Contexts)
+            {
+                <MudSelectItem T="Context" Value="@context">@context.Name</MudSelectItem>
+            }
+        </MudSelect>
+    }
+</MudElement>
+
+@code {
+    [Inject]
+    public IState<KubernetesContextState> ContextState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Dispatcher.Dispatch(new FetchKubernetesContextAction());
+
+        SubscribeToAction<ChangeKubernetesContextActionResult>(ContextChanged);
+    }
+
+    protected void OnValueChanged(Context context)
+    {
+        Dispatcher.Dispatch(new ChangeKubernetesContextAction(context));
+    }
+
+    private void ContextChanged(ChangeKubernetesContextActionResult e)
+    {
+        // _select.SetItem(e?.Context);
+    }
+}

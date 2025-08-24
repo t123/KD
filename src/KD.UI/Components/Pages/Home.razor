@@ -1,41 +1,11 @@
 ﻿@inherits FluxorComponent
 @page "/"
-@using BlazorMonaco
-@using BlazorMonaco.Editor
-@using BlazorMonaco.Languages
 
-<MudDrawer Open="true" Anchor="Anchor.Left" Variant="DrawerVariant.Persistent">
-    <ConfigNavigation />
-    <ContextNavigation />
-    <ObjectNavigation />
-</MudDrawer>
-<GenericPropertyNavigation />
-<MudMainContent>
-    <Search />
-    <YamlEditor />
-    <MudStack Row="false">
-        <MudStack Row=true Justify="Justify.FlexStart" AlignItems="AlignItems.Start" StretchItems="StretchItems.None" Wrap="Wrap.NoWrap">
-            <MudGrid>
-                <MudItem xs="11">
-                    <TabContextSelection />
-                </MudItem>
-                <MudItem xs="1" Class="align-self-end">
-                    <MudIconButton ButtonType="ButtonType.Button" Icon="@Icons.Material.Filled.Search" OnClick="Search"/>
-                </MudItem>
-            </MudGrid>
-        </MudStack>
-        <MudElement>
-            <TabNavigation />
-        </MudElement>
+<MudStack Row="false">
+    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Start" StretchItems="StretchItems.None" Wrap="Wrap.NoWrap">
+        <ContextTabBlock />
     </MudStack>
-</MudMainContent>
-
-@code {
-    [Inject]
-    public IDispatcher Dispatcher { get; set; }
-
-    private void Search(MouseEventArgs args)
-    {
-        Dispatcher.Dispatch(new OpenSearchAction());
-    }
-}
+    <MudElement>
+        <ObjectTabBlock />
+    </MudElement>
+</MudStack>

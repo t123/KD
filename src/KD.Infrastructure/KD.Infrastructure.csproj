@@ -7,17 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
 		<PackageReference Include="Examine" Version="3.7.1" />
+		<PackageReference Include="Fluxor.Blazor.Web" Version="6.7.0" />
 		<PackageReference Include="KubernetesClient" Version="17.0.4" />
-		<PackageReference Include="Fluxor.Blazor.Web" Version="6.6.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
-		<PackageReference Include="MudBlazor" Version="8.8.0" />
-		<PackageReference Include="System.Private.Uri" Version="4.3.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\KD.Domain\KD.Domain.csproj" />
-	</ItemGroup>
 </Project>

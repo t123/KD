@@ -1,0 +1,108 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var service = State.Value.Property?.Item?.Service;
+
+        if (service != null)
+        {
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@service.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@service.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@service.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@service.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@service.Metadata.Annotations" /></td>
+                            </tr>
+                            <tr>
+                                <td>Session Affinity</td>
+                                <td>@service.Spec.SessionAffinity</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="kd-subheading">Selectors</td>
+                            </tr>
+                            @foreach (var kvp in service.Spec?.Selector ?? System.Collections.Immutable.ImmutableDictionary<string, string>.Empty)
+                            {
+                                <tr>
+                                    <td>@kvp.Key</td>
+                                    <td>@kvp.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+                <MudExpansionPanel Text="Connection" Expanded="false" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Cluster IP</td>
+                                <td>@service.Spec.ClusterIP</td>
+                            </tr>
+                            <tr>
+                                <td>Cluster IPs</td>
+                                <td>
+                                    <ol>
+                                        @foreach (var ip in service.Spec.ClusterIPs ?? [])
+                                        {
+                                            <ol>@ip</ol>
+                                        }
+                                    </ol>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>IP Families</td>
+                                <td>
+                                    <ol>
+                                        @foreach (var ip in service.Spec.IpFamilies ?? [])
+                                        {
+                                            <ol>@ip</ol>
+                                        }
+                                    </ol>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>IP Family Policy</td>
+                                <td>@service.Spec.IpFamilyPolicy</td>
+                            </tr>
+                            <tr>
+                                <td>Ports</td>
+                                <td>
+                                    <ol>
+                                        @foreach (var p in service.Spec.Ports ?? [])
+                                        {
+                                            <ol>@p.Protocol @p.Name:@p.Port</ol>
+                                        }
+                                    </ol>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Internal Traffic Policy</td>
+                                <td>@service.Spec.InternalTrafficPolicy</td>
+                            </tr>
+                            <tr>
+                                <td>External Traffic Policy</td>
+                                <td>@service.Spec.ExternalTrafficPolicy</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

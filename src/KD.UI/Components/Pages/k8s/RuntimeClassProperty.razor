@@ -1,0 +1,28 @@
+@using KD.Infrastructure.k8s.ViewModels.Properties
+@inherits FluxorComponent
+
+<div>
+    @{
+        var property = State.Value.Property?.Item;
+
+        if (property != null)
+        {
+            <span>Uid: @property.Uid</span>
+        }
+    }
+</div>
+
+@code {
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+
+    [Inject]
+    public IState<RuntimeClassPropertyViewState> State { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}

@@ -1,0 +1,40 @@
+﻿@using Humanizer
+@typeparam T where T : IObjectViewModel
+
+@{
+    var lastUpdate = View.LastUpdate.HasValue
+                ? View.LastUpdate.Value.ToString("F")
+                : "never";
+}
+<MudElement HtmlTag="div" Class="kd-genericview-header">
+    <MudGrid Justify="Justify.FlexStart" Class="kd-mud-grid align-center">
+        @if (OnRefresh.HasDelegate)
+        {
+            <MudItem>
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate"  OnClick="@(async (s) => await OnRefresh.InvokeAsync(s))" />
+            </MudItem>
+        }
+        else
+        {
+            <MudItem>
+                <MudIcon Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate" @onmouseover="OnMouseOver" />
+            </MudItem>
+        }
+        <MudItem>
+            <MudIconButton Icon="@Icons.Material.Filled.Download" aria-label="refresh" OnClick="TriggerDownload" />
+        </MudItem>
+        @if (ShowSearch && OnSearch.HasDelegate)
+        {
+            <MudItem>
+                <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Label="Search" TextChanged="@(async (s) => await OnSearch.InvokeAsync(s))" T="string" />
+            </MudItem>
+        }
+        <MudItem>
+            <MudText>@ItemCount items</MudText>
+        </MudItem>
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+    </MudGrid>
+</MudElement>

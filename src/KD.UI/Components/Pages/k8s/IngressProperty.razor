@@ -1,0 +1,79 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var ingress = State.Value.Property?.Item?.Ingress;
+
+        if (ingress != null)
+        {
+            <MudExpansionPanels MultiExpansion="true">
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@ingress.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@ingress.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@ingress.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@ingress.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@ingress.Metadata.Annotations" /></td>
+                            </tr>
+                            <tr>
+                                <td>Ingress Class Name</td>
+                                <td>@ingress.Spec.IngressClassName</td>
+                            </tr>
+                            <tr>
+                                <td>TLS</td>
+                                <td>
+                                    <ol>
+                                        @foreach (var tls in ingress.Spec.Tls)
+                                        {
+                                            <li>@tls.SecretName</li>
+                                        }
+                                    </ol>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+                <MudExpansionPanel Text="Rules" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable>
+                        <tbody>
+                            @foreach (var rule in ingress.Spec?.Rules ?? [])
+                            {
+                                <tr>
+                                    <td colspan="3" class="kd-subheading">Host: @rule.Host</td>
+                                </tr>
+                                foreach (var path in rule.Http.Paths ?? [])
+                                {
+                                    <tr>
+                                        <td>@path.Path</td>
+                                        <td>@path.PathType</td>
+                                        <td>
+                                            @if (path.Backend.Service != null)
+                                            {
+                                                <text>@path.Backend.Service.Name:@path.Backend.Service.Port.Number</text>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

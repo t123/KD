@@ -5,22 +5,28 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using CSharpFunctionalExtensions
+
+@using Fluxor
+@using Fluxor.Blazor.Web.Components
+
 @using KD.UI
+@using KD.UI.Code
 @using KD.UI.Components
 @using KD.UI.Components.Pages
-@using KD.UI.Components.Pages.Shared
-@using KD.UI.Components.Pages.Shared.Tags
-@using KD.UI.Components.Pages.Ui
+@using KD.UI.Components.Pages.Common
+@using KD.UI.Components.Pages.Blocks
+@using KD.UI.Components.Pages.k8s
+@using KD.UI.Components.Components
+@using KD.UI.Components.Components.Properties
 
-@using CSharpFunctionalExtensions
-@using k8s.Models
+@using KD.Infrastructure.k8s;
+@using KD.Infrastructure.k8s.Fluxor;
+@using KD.Infrastructure.k8s.Fluxor.Objects;
+@using KD.Infrastructure.k8s.Fluxor.Properties;
+@using KD.Infrastructure.k8s.Fluxor.Misc;
+@using KD.Infrastructure.k8s.ViewModels.Objects
+@using KD.Infrastructure.k8s.ViewModels.Properties
 
 @using MudBlazor
-@using Fluxor
-@using KD.Infrastructure.Fluxor
-@using KD.Infrastructure.Fluxor.Views
-@using Fluxor.Blazor.Web.Components
-@using KD.Infrastructure
-
-@using KD.Infrastructure.ViewModels
-
+@using MudExtensions

@@ -1,14 +1,24 @@
-﻿@inherits LayoutComponentBase
+﻿@inherits FluxorLayout
 
-<Fluxor.Blazor.Web.StoreInitializer />
-
-<MudThemeProvider IsDarkMode=true />
+<MudThemeProvider IsDarkMode="true" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+<Fluxor.Blazor.Web.StoreInitializer />
+
 <ErrorBoundary>
     <MudLayout>
-        @Body
+        <MudDrawer Open="true" Anchor="Anchor.Left" Variant="DrawerVariant.Persistent" Width="15%">
+            <ConfigBlock />
+            <ContextBlock />
+            <NamespaceBlock />
+            <ObjectNavigationMenuBlock />
+        </MudDrawer>
+        <PropertiesBlock />
+        <MudMainContent>
+            <YamlEditor />
+            @Body
+        </MudMainContent>
     </MudLayout>
 </ErrorBoundary>

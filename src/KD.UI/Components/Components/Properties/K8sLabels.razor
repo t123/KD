@@ -1,0 +1,15 @@
+﻿<MudElement>
+    <MudChipSet T="string">
+        @foreach (var kvp in Labels ?? System.Collections.Immutable.ImmutableDictionary<string, string>.Empty)
+        {
+            <MudChip Text="@(kvp.Key + ": " + @kvp.Value)" Size="Size.Small" Variant="Variant.Text" Color="Color.Info" />
+        }
+    </MudChipSet>
+</MudElement>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public IDictionary<string, string> Labels { get; set; }
+}

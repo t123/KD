@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using KD.Infrastructure.k8s;
+using KD.Infrastructure.k8s.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KD.Infrastructure;
 
@@ -10,5 +12,7 @@ public static class Startup
         serviceCollection.AddSingleton<ConfigsManager>();
         serviceCollection.AddSingleton<ContextsManager>();
         serviceCollection.AddTransient<IIndexManager, IndexManager>();
+        serviceCollection.AddTransient<IViewStateHelper, ViewStateHelper>();
+        serviceCollection.AddTransient<IKubernetesDataLoader, DummyKubernetesDataLoader>();
     }
 }

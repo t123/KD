@@ -1,0 +1,286 @@
+﻿@using global::k8s
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var pod = State.Value.Property?.Item?.Pod;
+
+        if (pod != null)
+        {
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@pod.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@pod.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@pod.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@pod.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@pod.Metadata.Annotations" /></td>
+                            </tr>
+                            <tr>
+                                <td>Node</td>
+                                <td>@pod.Spec.NodeName</td>
+                            </tr>
+                            <tr>
+                                <td>Pod IP</td>
+                                <td>@pod.Status.PodIP</td>
+                            </tr>
+                            <tr>
+                                <td>Pod IPs</td>
+                                <td>@string.Join(" ", pod.Status.PodIPs?.Select(x => x.Ip) ?? [])</td>
+                            </tr>
+                            <tr>
+                                <td>QoS</td>
+                                <td>@pod.Status.QosClass</td>
+                            </tr>
+                            <tr>
+                                <td>Restart Policy</td>
+                                <td>@pod.Spec.RestartPolicy</td>
+                            </tr>
+                            <tr>
+                                <td>Image Pull Secrets</td>
+                                <td>
+                                    @string.Join("<br/>", pod.Spec.ImagePullSecrets?.Select(x => x.Name)?.Distinct() ?? [])
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dns Policy</td>
+                                <td>@pod.Spec.DnsPolicy</td>
+                            </tr>
+                            <tr>
+                                <td>Conditions</td>
+                                <td><K8sConditions Conditions="pod.Status.Conditions.Select(x => new ConditionViewModel(x.Type, x.Status, x.Reason, x.Message))" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+                @if (pod.Spec?.Volumes?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Pod Volumes" Expanded="false" Dense="true" Gutters="false" class="kd-heading">
+                        <MudSimpleTable Dense="true">
+                            <tbody>
+                                @foreach (var v in pod.Spec?.Volumes ?? [])
+                                {
+                                    <K8sVolumes Volume="v" />
+                                }
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudExpansionPanel>
+                }
+                @if (pod.Spec?.InitContainers?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Init Containers" Expanded="false" Dense="true" Gutters="false" class="kd-heading">
+                        @foreach (var container in pod.Spec.InitContainers ?? [])
+                        {
+                            var status = pod.Status.InitContainerStatuses.SingleOrDefault(x => x.Name == container.Name);
+                            <K8sContainers StatusContainer="status" Container="container" />
+                        }
+                    </MudExpansionPanel>
+                }
+                @if (pod.Spec?.Containers?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Containers" Expanded="false" Dense="true" Gutters="false" class="kd-heading">
+                        @foreach (var container in pod.Spec.Containers ?? [])
+                        {
+                            var status = pod.Status.ContainerStatuses.SingleOrDefault(x => x.Name == container.Name);
+                            <K8sContainers StatusContainer="status" Container="container" />
+                        }
+                    </MudExpansionPanel>
+                }
+                @if (pod.Spec?.Tolerations?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Tolerations" Expanded="false" Dense="true" Gutters="false" class="kd-heading">
+                        <MudSimpleTable Dense="true">
+                            <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Effect</th>
+                                    <th>Operator</th>
+                                    <th>Value</th>
+                                    <th>Seconds</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var toleration in pod.Spec?.Tolerations ?? [])
+                                {
+                                    <tr>
+                                        <td>@toleration.Key</td>
+                                        <td>@toleration.Effect</td>
+                                        <td>@toleration.OperatorProperty</td>
+                                        <td>@toleration.Value</td>
+                                        <td>@toleration.TolerationSeconds</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudExpansionPanel>
+                }
+                @if (
+                        pod.Spec?.Affinity?.NodeAffinity != null ||
+                        pod.Spec?.Affinity?.PodAffinity != null ||
+                        pod.Spec?.Affinity?.PodAntiAffinity != null
+                        )
+                {
+                    <MudExpansionPanel Text="Affinites" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
+                        @if (pod.Spec?.Affinity?.NodeAffinity != null)
+                        {
+                            string yaml = KubernetesYaml.Serialize(pod.Spec.Affinity.NodeAffinity) ?? string.Empty;
+
+                            <MudSimpleTable Dense="true">
+                                <thead>
+                                    <tr class="kd-subheading">
+                                        <th>Node Affinities</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <pre>@yaml</pre>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+
+                        @if (pod.Spec?.Affinity?.PodAffinity != null)
+                        {
+                            string yaml = KubernetesYaml.Serialize(pod.Spec.Affinity.PodAffinity) ?? string.Empty;
+
+                            <MudSimpleTable Dense="true">
+                                <thead>
+                                    <tr class="kd-subheading">
+                                        <th>Pod Affinities</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <pre>@yaml</pre>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+
+                        @if (pod.Spec?.Affinity?.PodAntiAffinity != null)
+                        {
+                            string yaml = KubernetesYaml.Serialize(pod.Spec.Affinity.PodAntiAffinity) ?? string.Empty;
+
+                            <MudSimpleTable Dense="true">
+                                <thead>
+                                    <tr class="kd-subheading">
+                                        <th>Pod Anti Affinities</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <pre>@yaml</pre>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </MudSimpleTable>
+                        }
+                    </MudExpansionPanel>
+                }
+            </MudExpansionPanels>
+        }
+    }
+
+    @*
+        public record AffinityViewModel(string Key, string OperatorProperty, IEnumerable<string> Values);
+
+        <MudExpansionPanel Text="Affinites" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        @if (pod.Spec.Affinity.NodeAffinity != null)
+                        {
+                            var affinity = pod.Spec.Affinity.NodeAffinity;
+                            var pdsidr = affinity?.PreferredDuringSchedulingIgnoredDuringExecution ?? [];
+                            var rdside = affinity?.RequiredDuringSchedulingIgnoredDuringExecution;
+
+                            @foreach (var p in pdsidr.OrderBy(x => x.Weight))
+                            {
+                                var mes = (p?.Preference?.MatchExpressions ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+                                var mfs = (p?.Preference?.MatchFields ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+
+                                <K8sAffinities Title="Node Affinities: PreferredDuringSchedulingIgnoredDuringExecution: MatchExpressions" Affinities="@mes" />
+                                <K8sAffinities Title="Node Affinities: PreferredDuringSchedulingIgnoredDuringExecution: MatchFields" Affinities="@mfs" />
+                            }
+
+                            if (rdside != null)
+                            {
+                                var nsts = rdside.NodeSelectorTerms ?? [];
+
+                                foreach (var nst in nsts)
+                                {
+                                    var mes = (nst?.MatchExpressions ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+                                    var mfs = (nst?.MatchFields ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+
+                                    <K8sAffinities Title="Node Affinities: RequiredDuringSchedulingIgnoredDuringExecution: MatchExpressions" Affinities="@mes" />
+                                    <K8sAffinities Title="Node Affinities: RequiredDuringSchedulingIgnoredDuringExecution: MatchFields" Affinities="@mfs" />
+                                }
+                            }
+                        }
+                    </MudSimpleTable>
+
+                    <MudSimpleTable Dense="true">
+                        @if (pod.Spec.Affinity.PodAntiAffinity != null)
+                        {
+                            var affinity = pod.Spec.Affinity.PodAntiAffinity;
+                            var pdside = affinity?.PreferredDuringSchedulingIgnoredDuringExecution ?? [];
+                            var rdside = affinity?.RequiredDuringSchedulingIgnoredDuringExecution ?? [];
+
+                            if (pdside.Any())
+                            {
+                                foreach (var p in pdside.OrderBy(x => x.Weight))
+                                {
+                                    var lsme = (p?.PodAffinityTerm?.LabelSelector?.MatchExpressions ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+                                    var nsme = (p?.PodAffinityTerm?.NamespaceSelector?.MatchExpressions ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+
+                                    <K8sAffinities Title="PodAntiAffinities: PreferredDuringSchedulingIgnoredDuringExecution: MatchExpressions" Affinities="@lsme" />
+                                    <K8sAffinities Title="PodAntiAffinities: PreferredDuringSchedulingIgnoredDuringExecution: NamespaceSelector" Affinities="@lsme" />
+                                }
+                            }
+
+                            if (rdside.Any())
+                            {
+                                <tr class="kd-subheading">
+                                    <td colspan="2">Pod Anti Affinities: PreferredDuringSchedulingIgnoredDuringExecution</td>
+                                </tr>
+
+                                foreach (var p in rdside)
+                                {
+                                    <tr>
+                                        <td>@p.TopologyKey</td>
+                                        <td>
+                                            <MudSimpleTable Dense="true">
+                                                @{
+                                                    var nse = (p?.NamespaceSelector?.MatchExpressions ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+                                                    var nsl = (p?.NamespaceSelector?.MatchLabels ?? []).Select(x => new AffinityViewModel(x.Key, x.OperatorProperty, x.Values));
+
+                                                    var x = p?.
+                                                                            }
+                                            </MudSimpleTable>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+    *@
+</MudElement>
