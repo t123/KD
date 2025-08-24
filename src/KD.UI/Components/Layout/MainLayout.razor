@@ -20,5 +20,27 @@
             <YamlEditor />
             @Body
         </MudMainContent>
+        <MudOverlay Visible="OverlayState.Value.IsOpen" DarkBackground AutoClose="true" OnClosed="OnClosed" />
     </MudLayout>
 </ErrorBoundary>
+
+@code {
+    [Inject]
+    private IState<OverlayViewState> OverlayState { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void OnClosed()
+    {
+        if (OverlayState.Value.CloseAction != null)
+        {
+            Dispatcher.Dispatch(OverlayState.Value.CloseAction);
+        }
+    }
+}

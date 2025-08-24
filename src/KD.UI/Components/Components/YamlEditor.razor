@@ -42,8 +42,13 @@
             {
                 System.Diagnostics.Debug.WriteLine("SubscribeToAction: Delaying");
 
-                await Task.Delay(200);
+                await Task.Delay(250);
                 i++;
+            }
+
+            if (!OnDidInitSuccess)
+            {
+                return;
             }
 
             System.Diagnostics.Debug.WriteLine("SubscribeToAction: End");

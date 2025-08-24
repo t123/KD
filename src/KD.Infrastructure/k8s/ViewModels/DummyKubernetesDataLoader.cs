@@ -457,7 +457,7 @@ internal class DummyKubernetesDataLoader : IKubernetesDataLoader
 
     public async Task<V1Node?> GetNode(Context context, string ns, string name, CancellationToken cancellationToken)
     {
-        var list = await GetNodes(context, [name], cancellationToken);
+        var list = await GetNodes(context, [], cancellationToken);
         var item = list.Items.SingleOrDefault(x => x.Metadata.Name == name);
         return item;
     }

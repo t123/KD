@@ -79,7 +79,17 @@ internal class EditorViewStateEffects
         if (item != null)
         {
             string yaml = KubernetesYaml.Serialize(item) ?? string.Empty;
+
+            object a = new CloseEditorAction();
+
+            dispatcher.Dispatch(new OpenOverlayAction(a));
             dispatcher.Dispatch(new OpenEditorActionResult(yaml));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleCloseEditorAction(CloseEditorAction action, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new CloseOverlayAction(action.CancellationToken));
     }
 }
