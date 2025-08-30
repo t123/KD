@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class ReplicationControllerPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public ReplicationControllerPropertyViewStateEffects(IIndexManager indexManager)
+    public ReplicationControllerPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesReplicationControllerPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new ReplicationControllerPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var replicationController = await _viewStateHelper.GetReplicationController(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesReplicationControllerPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (replicationController != null)
+        {
+            var properties = new ReplicationControllerPropertyViewModel()
+            {
+                Created = replicationController.Metadata.CreationTimestamp,
+                Name = replicationController.Metadata.Name,
+                Tab = action.Tab,
+                Uid = replicationController.Metadata.Uid,
+                ReplicationController = replicationController
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesReplicationControllerPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

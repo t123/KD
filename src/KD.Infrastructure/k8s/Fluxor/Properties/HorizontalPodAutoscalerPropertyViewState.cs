@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class HorizontalPodAutoscalerPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public HorizontalPodAutoscalerPropertyViewStateEffects(IIndexManager indexManager)
+    public HorizontalPodAutoscalerPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesHorizontalPodAutoscalerPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new HorizontalPodAutoscalerPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var horizontalPodAutoscaler = await _viewStateHelper.GetHorizontalPodAutoscaler(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesHorizontalPodAutoscalerPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (horizontalPodAutoscaler != null)
+        {
+            var properties = new HorizontalPodAutoscalerPropertyViewModel
+            {
+                Created = horizontalPodAutoscaler.Metadata.CreationTimestamp,
+                Name = horizontalPodAutoscaler.Metadata.Name,
+                Tab = action.Tab,
+                Uid = horizontalPodAutoscaler.Metadata.Uid,
+                HorizontalPodAutoscaler = horizontalPodAutoscaler
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesHorizontalPodAutoscalerPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

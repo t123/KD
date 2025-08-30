@@ -29,7 +29,7 @@ public record ReplicationControllerViewModel(string Uid, string Name, string Nam
 public record ConfigMapViewModel(string Uid, string Name, string Namespace, DateTime? Created, string[] Keys) : IObjectViewModel;
 public record SecretViewModel(string Uid, string Name, string Namespace, DateTime? Created, string[] Keys) : IObjectViewModel;
 public record ResourceQuotaViewModel(string Uid, string Name, string Namespace, DateTime? Created) : IObjectViewModel;
-public record HorizontalPodAutoscalerViewModel(string Uid, string Name, string Namespace, DateTime? Created, int? MinReplicas, int MaxReplicas, int CurrentReplicas, int DesiredReplicas, int? CurrentCPUUtilizationPercentage) : IObjectViewModel;
+public record HorizontalPodAutoscalerViewModel(string Uid, string Name, string Namespace, DateTime? Created, int? MinReplicas, int MaxReplicas, int? CurrentReplicas, int DesiredReplicas) : IObjectViewModel;
 public record PodDisruptionBudgetViewModel(string Uid, string Name, string Namespace, DateTime? Created, string MinAvailable, string MaxUnavailable, int CurrentHealthy, int DesiredHealthy) : IObjectViewModel;
 public record PriorityClassViewModel(string Uid, string Name, string Namespace, DateTime? Created) : IObjectViewModel;
 public record RuntimeClassViewModel(string Uid, string Name, string Namespace, DateTime? Created) : IObjectViewModel;

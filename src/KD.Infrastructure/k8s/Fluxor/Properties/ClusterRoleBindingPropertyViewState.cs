@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class ClusterRoleBindingPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public ClusterRoleBindingPropertyViewStateEffects(IIndexManager indexManager)
+    public ClusterRoleBindingPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesClusterRoleBindingPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new ClusterRoleBindingPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var clusterRoleBinding = await _viewStateHelper.GetClusterRoleBinding(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesClusterRoleBindingPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (clusterRoleBinding != null)
+        {
+            var properties = new ClusterRoleBindingPropertyViewModel()
+            {
+                Created = clusterRoleBinding.Metadata.CreationTimestamp,
+                Name = clusterRoleBinding.Metadata.Name,
+                Tab = action.Tab,
+                Uid = clusterRoleBinding.Metadata.Uid,
+                ClusterRoleBinding = clusterRoleBinding
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesClusterRoleBindingPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

@@ -49,6 +49,33 @@ internal interface IViewStateHelper
     Task<V1Namespace?> GetNamespace(Context context, string ns, string name, CancellationToken cancellationToken);
     Task<V1Service?> GetService(Context context, string ns, string name, CancellationToken cancellationToken);
     Task<V1Node?> GetNode(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ClusterRoleBinding?> GetClusterRoleBinding(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ClusterRole?> GetClusterRole(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ConfigMap?> GetConfigMap(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1CronJob?> GetCronJob(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1CustomResourceDefinition?> GetCustomResourcesDefinition(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1DaemonSet?> GetDaemonSet(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V2HorizontalPodAutoscaler?> GetHorizontalPodAutoscaler(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1IngressClass?> GetIngressClass(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1Job?> GetJob(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1Lease?> GetLease(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1MutatingWebhookConfiguration?> GetMutatingWebhookConfiguration(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1NetworkPolicy?> GetNetworkPolicy(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1PersistentVolumeClaim?> GetPersistentVolumeClaim(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1PersistentVolume?> GetPersistentVolume(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1PodDisruptionBudget?> GetPodDisruptionBudget(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1PriorityClass?> GetPriorityClass(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ReplicaSet?> GetReplicaSet(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ReplicationController?> GetReplicationController(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ResourceQuota?> GetResourceQuota(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1RoleBinding?> GetRoleBinding(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1Role?> GetRole(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1RuntimeClass?> GetRuntimeClass(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1Secret?> GetSecret(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ServiceAccount?> GetServiceAccount(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1StatefulSet?> GetStatefulSet(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1StorageClass?> GetStorageClass(Context context, string ns, string name, CancellationToken cancellationToken);
+    Task<V1ValidatingWebhookConfiguration?> GetValidatingWebhookConfiguration(Context context, string ns, string name, CancellationToken cancellationToken);
 }
 
 internal class ViewStateHelper : IViewStateHelper
@@ -421,8 +448,7 @@ internal class ViewStateHelper : IViewStateHelper
                     x.Spec.MinReplicas,
                     x.Spec.MaxReplicas,
                     x.Status.CurrentReplicas,
-                    x.Status.DesiredReplicas,
-                    x.Status.CurrentCPUUtilizationPercentage
+                    x.Status.DesiredReplicas
                 ))
                 .OrderBy(x => x.Namespace)
                 .ThenBy(x => x.Name);
@@ -548,7 +574,7 @@ internal class ViewStateHelper : IViewStateHelper
 
         try
         {
-            items = (await _dataLoader.GetMutatingWebhookConfiguration(context, namespaces, cancellationToken))
+            items = (await _dataLoader.GetMutatingWebhookConfigurations(context, namespaces, cancellationToken))
                 .Items
                 .Select(x => new MutatingWebhookConfigurationViewModel(x.Uid(), x.Name(), x.Namespace(), x.CreationTimestamp()))
                 .OrderBy(x => x.Namespace)
@@ -1004,5 +1030,140 @@ internal class ViewStateHelper : IViewStateHelper
     public async Task<V1Node?> GetNode(Context context, string ns, string name, CancellationToken cancellationToken)
     {
         return await _dataLoader.GetNode(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ClusterRoleBinding?> GetClusterRoleBinding(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetClusterRoleBinding(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ClusterRole?> GetClusterRole(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetClusterRole(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ConfigMap?> GetConfigMap(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetConfigMap(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1CronJob?> GetCronJob(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetCronJob(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1CustomResourceDefinition?> GetCustomResourcesDefinition(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetCustomResourcesDefinition(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1DaemonSet?> GetDaemonSet(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetDaemonSet(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V2HorizontalPodAutoscaler?> GetHorizontalPodAutoscaler(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetHorizontalPodAutoscaler(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1IngressClass?> GetIngressClass(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetIngressClass(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1Job?> GetJob(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetJob(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1Lease?> GetLease(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetLease(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1MutatingWebhookConfiguration?> GetMutatingWebhookConfiguration(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetMutatingWebhookConfiguration(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1NetworkPolicy?> GetNetworkPolicy(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetNetworkPolicy(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1PersistentVolumeClaim?> GetPersistentVolumeClaim(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetPersistentVolumeClaim(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1PersistentVolume?> GetPersistentVolume(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetPersistentVolume(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1PodDisruptionBudget?> GetPodDisruptionBudget(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetPodDisruptionBudget(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1PriorityClass?> GetPriorityClass(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetPriorityClass(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ReplicaSet?> GetReplicaSet(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetReplicaSet(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ReplicationController?> GetReplicationController(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetReplicationController(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ResourceQuota?> GetResourceQuota(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetResourceQuota(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1RoleBinding?> GetRoleBinding(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetRoleBinding(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1Role?> GetRole(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetRole(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1RuntimeClass?> GetRuntimeClass(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetRuntimeClass(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1Secret?> GetSecret(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetSecret(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ServiceAccount?> GetServiceAccount(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetServiceAccount(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1StatefulSet?> GetStatefulSet(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetStatefulSet(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1StorageClass?> GetStorageClass(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetStorageClass(context, ns, name, cancellationToken);
+    }
+
+    public async Task<V1ValidatingWebhookConfiguration?> GetValidatingWebhookConfiguration(Context context, string ns, string name, CancellationToken cancellationToken)
+    {
+        return await _dataLoader.GetValidatingWebhookConfiguration(context, ns, name, cancellationToken);
     }
 }

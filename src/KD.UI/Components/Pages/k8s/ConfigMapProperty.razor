@@ -1,28 +1,41 @@
-@using KD.Infrastructure.k8s.ViewModels.Properties
-@inherits FluxorComponent
+@inherits BaseProperty
 
-<div>
+<MudElement HtmlTag="div">
     @{
-        var property = State.Value.Property?.Item;
+        var configMap = State.Value.Property?.Item?.ConfigMap;
 
-        if (property != null)
+        if (configMap != null)
         {
-            <span>Uid: @property.Uid</span>
+            <PropertyHeader T="ConfigMapPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@configMap.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@configMap.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@configMap.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@configMap.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@configMap.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
         }
     }
-</div>
+</MudElement>
 
-@code {
-    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
-
-    [Inject]
-    public IState<ConfigMapPropertyViewState> State { get; set; }
-
-    [Inject]
-    public IDispatcher Dispatcher { get; set; }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-}

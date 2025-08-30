@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class StatefulSetPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public StatefulSetPropertyViewStateEffects(IIndexManager indexManager)
+    public StatefulSetPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesStatefulSetPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new StatefulSetPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var statefulSet = await _viewStateHelper.GetStatefulSet(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesStatefulSetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (statefulSet != null)
+        {
+            var properties = new StatefulSetPropertyViewModel()
+            {
+                Created = statefulSet.Metadata.CreationTimestamp,
+                Name = statefulSet.Metadata.Name,
+                Tab = action.Tab,
+                Uid = statefulSet.Metadata.Uid,
+                StatefulSet = statefulSet
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesStatefulSetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

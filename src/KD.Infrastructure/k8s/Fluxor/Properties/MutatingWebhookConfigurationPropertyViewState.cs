@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class MutatingWebhookConfigurationPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public MutatingWebhookConfigurationPropertyViewStateEffects(IIndexManager indexManager)
+    public MutatingWebhookConfigurationPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesMutatingWebhookConfigurationPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new MutatingWebhookConfigurationPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var mwh = await _viewStateHelper.GetMutatingWebhookConfiguration(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesMutatingWebhookConfigurationPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (mwh != null)
+        {
+            var properties = new MutatingWebhookConfigurationPropertyViewModel()
+            {
+                Created = mwh.Metadata.CreationTimestamp,
+                Name = mwh.Metadata.Name,
+                Tab = action.Tab,
+                Uid = mwh.Metadata.Uid,
+                MutatingWebhookConfiguration = mwh
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesMutatingWebhookConfigurationPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

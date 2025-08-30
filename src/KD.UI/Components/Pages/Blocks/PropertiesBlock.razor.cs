@@ -3,11 +3,10 @@ using KD.Infrastructure.k8s.Fluxor.Properties;
 using KD.UI.Code;
 using KD.UI.Components.Pages.k8s;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace KD.UI.Components.Pages.Blocks;
 
-public partial class PropertiesBlock : BaseView
+public partial class PropertiesBlock : BaseProperty
 {
     private DynamicComponent _dc;
 
@@ -31,14 +30,4 @@ public partial class PropertiesBlock : BaseView
 
     [Inject]
     public IState<PropertyViewState> PropertyViewState { get; set; }
-
-    private void ClosePropertyWindow(MouseEventArgs e)
-    {
-        Dispatcher.Dispatch(new ClosePropertiesAction(_cancellationTokenSource.Token));
-    }
-
-    private void ToggleWindow(MouseEventArgs e)
-    {
-        Dispatcher.Dispatch(new TogglePropertiesAction(PropertyViewState.Value.Width, _cancellationTokenSource.Token));
-    }
 }

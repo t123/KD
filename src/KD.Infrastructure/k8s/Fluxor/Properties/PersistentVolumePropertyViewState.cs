@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class PersistentVolumePropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public PersistentVolumePropertyViewStateEffects(IIndexManager indexManager)
+    public PersistentVolumePropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesPersistentVolumePropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new PersistentVolumePropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var pv = await _viewStateHelper.GetPersistentVolume(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesPersistentVolumePropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (pv != null)
+        {
+            var properties = new PersistentVolumePropertyViewModel()
+            {
+                Created = pv.Metadata.CreationTimestamp,
+                Name = pv.Metadata.Name,
+                Tab = action.Tab,
+                Uid = pv.Metadata.Uid,
+                PersistentVolume = pv
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesPersistentVolumePropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class ValidatingWebhookConfigurationPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public ValidatingWebhookConfigurationPropertyViewStateEffects(IIndexManager indexManager)
+    public ValidatingWebhookConfigurationPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesValidatingWebhookConfigurationPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new ValidatingWebhookConfigurationPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var vwc = await _viewStateHelper.GetValidatingWebhookConfiguration(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesValidatingWebhookConfigurationPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (vwc != null)
+        {
+            var properties = new ValidatingWebhookConfigurationPropertyViewModel()
+            {
+                Created = vwc.Metadata.CreationTimestamp,
+                Name = vwc.Metadata.Name,
+                Tab = action.Tab,
+                Uid = vwc.Metadata.Uid,
+                ValidatingWebhookConfiguration = vwc
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesValidatingWebhookConfigurationPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

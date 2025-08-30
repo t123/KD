@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class PriorityClassPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public PriorityClassPropertyViewStateEffects(IIndexManager indexManager)
+    public PriorityClassPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesPriorityClassPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new PriorityClassPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var priorityClass = await _viewStateHelper.GetPriorityClass(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesPriorityClassPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (priorityClass != null)
+        {
+            var properties = new PriorityClassPropertyViewModel()
+            {
+                Created = priorityClass.Metadata.CreationTimestamp,
+                Name = priorityClass.Metadata.Name,
+                Tab = action.Tab,
+                Uid = priorityClass.Metadata.Uid,
+                PriorityClass = priorityClass
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesPriorityClassPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

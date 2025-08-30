@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class RuntimeClassPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public RuntimeClassPropertyViewStateEffects(IIndexManager indexManager)
+    public RuntimeClassPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesRuntimeClassPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new RuntimeClassPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var runtimeClass = await _viewStateHelper.GetRuntimeClass(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesRuntimeClassPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (runtimeClass != null)
+        {
+            var properties = new RuntimeClassPropertyViewModel()
+            {
+                Created = runtimeClass.Metadata.CreationTimestamp,
+                Name = runtimeClass.Metadata.Name,
+                Tab = action.Tab,
+                Uid = runtimeClass.Metadata.Uid,
+                RuntimeClass = runtimeClass
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesRuntimeClassPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

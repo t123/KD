@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class ServiceAccountPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public ServiceAccountPropertyViewStateEffects(IIndexManager indexManager)
+    public ServiceAccountPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesServiceAccountPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new ServiceAccountPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var serviceAccount = await _viewStateHelper.GetServiceAccount(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesServiceAccountPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (serviceAccount != null)
+        {
+            var properties = new ServiceAccountPropertyViewModel()
+            {
+                Created = serviceAccount.Metadata.CreationTimestamp,
+                Name = serviceAccount.Metadata.Name,
+                Tab = action.Tab,
+                Uid = serviceAccount.Metadata.Uid,
+                ServiceAccount = serviceAccount
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesServiceAccountPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

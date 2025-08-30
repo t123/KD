@@ -1,0 +1,29 @@
+﻿@inherits BaseProperty
+@typeparam T where T : IPropertyViewModel
+
+@{
+    var lastUpdate = PropertyViewState.Value.LastUpdate.HasValue
+                ? PropertyViewState.Value.LastUpdate.Value.ToString("F")
+                : "never";
+}
+<MudGrid Justify="Justify.FlexStart" Class="kd-mud-grid align-center">
+    <MudItem>
+        <MudIconButton Icon="@Icons.Material.Outlined.Expand" OnClick="ToggleWindow" Class="rotate-90"></MudIconButton>
+    </MudItem>
+    <MudItem>
+        <MudText>@ViewModel?.ObjectPropertyType</MudText>
+    </MudItem>
+    <MudItem>
+        <MudText Typo="Typo.body1">@ViewModel?.Name</MudText>
+    </MudItem>
+    <MudItem>
+        <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy" OnClick="@((e) => CopyToClipboard(ViewModel?.Name))" Class="rotate-90"></MudIconButton>
+    </MudItem>
+    <MudItem>
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate" OnClick="@(async (s) => await OnRefresh.InvokeAsync(s))" />
+    </MudItem>
+    <div class="flex-grow-1"></div>
+    <MudItem>
+        <MudIconButton Icon="@Icons.Material.Outlined.Close" OnClick="ClosePropertyWindow"></MudIconButton>
+    </MudItem>
+</MudGrid>

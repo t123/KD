@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class LeasePropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public LeasePropertyViewStateEffects(IIndexManager indexManager)
+    public LeasePropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesLeasePropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new LeasePropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var lease = await _viewStateHelper.GetLease(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesLeasePropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (lease != null)
+        {
+            var properties = new LeasePropertyViewModel()
+            {
+                Created = lease.Metadata.CreationTimestamp,
+                Name = lease.Metadata.Name,
+                Tab = action.Tab,
+                Uid = lease.Metadata.Uid,
+                Lease = lease
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesLeasePropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

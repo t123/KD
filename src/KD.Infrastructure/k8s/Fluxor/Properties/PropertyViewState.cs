@@ -52,9 +52,6 @@ public class PropertyViewStateEffects
     public async Task HandleOpenPropertiesAction(OpenPropertiesAction action, IDispatcher dispatcher)
     {
         action.CancellationToken.ThrowIfCancellationRequested();
-        //var context = new PropertyViewModelContext(action.PropertyViewType, client, action.Tab, action.viewModel);
-        //IPropertyViewModel? property = await PropertyViewModelCreator.Create(context);
-        //dispatcher.Dispatch(new OpenPropertiesActionResult(property));
     }
 
     [EffectMethod]

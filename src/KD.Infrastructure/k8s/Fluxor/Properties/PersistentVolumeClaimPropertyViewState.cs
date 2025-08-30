@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class PersistentVolumeClaimPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public PersistentVolumeClaimPropertyViewStateEffects(IIndexManager indexManager)
+    public PersistentVolumeClaimPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesPersistentVolumeClaimPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new PersistentVolumeClaimPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var pvc = await _viewStateHelper.GetPersistentVolumeClaim(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesPersistentVolumeClaimPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (pvc != null)
+        {
+            var properties = new PersistentVolumeClaimPropertyViewModel()
+            {
+                Created = pvc.Metadata.CreationTimestamp,
+                Name = pvc.Metadata.Name,
+                Tab = action.Tab,
+                Uid = pvc.Metadata.Uid,
+                PersistentVolumeClaim = pvc
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesPersistentVolumeClaimPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class PodDisruptionBudgetPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public PodDisruptionBudgetPropertyViewStateEffects(IIndexManager indexManager)
+    public PodDisruptionBudgetPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesPodDisruptionBudgetPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new PodDisruptionBudgetPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var pdb = await _viewStateHelper.GetPodDisruptionBudget(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesPodDisruptionBudgetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (pdb != null)
+        {
+            var properties = new PodDisruptionBudgetPropertyViewModel()
+            {
+                Created = pdb.Metadata.CreationTimestamp,
+                Name = pdb.Metadata.Name,
+                Tab = action.Tab,
+                Uid = pdb.Metadata.Uid,
+                PodDisruptionBudget = pdb
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesPodDisruptionBudgetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

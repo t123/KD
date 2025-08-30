@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class CustomResourcesDefinitionPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public CustomResourcesDefinitionPropertyViewStateEffects(IIndexManager indexManager)
+    public CustomResourcesDefinitionPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesCustomResourcesDefinitionPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new CustomResourcesDefinitionPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var customResourceDefinition = await _viewStateHelper.GetCustomResourcesDefinition(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesCustomResourcesDefinitionPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (customResourceDefinition != null)
+        {
+            var properties = new CustomResourcesDefinitionPropertyViewModel
+            {
+                Created = customResourceDefinition.Metadata.CreationTimestamp,
+                Name = customResourceDefinition.Metadata.Name,
+                Tab = action.Tab,
+                Uid = customResourceDefinition.Metadata.Uid,
+                CustomResourceDefinition = customResourceDefinition
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesCustomResourcesDefinitionPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

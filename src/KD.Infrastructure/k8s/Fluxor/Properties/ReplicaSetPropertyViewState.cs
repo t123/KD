@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class ReplicaSetPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public ReplicaSetPropertyViewStateEffects(IIndexManager indexManager)
+    public ReplicaSetPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesReplicaSetPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new ReplicaSetPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var replicaSet = await _viewStateHelper.GetReplicaSet(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesReplicaSetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (replicaSet != null)
+        {
+            var properties = new ReplicaSetPropertyViewModel()
+            {
+                Created = replicaSet.Metadata.CreationTimestamp,
+                Name = replicaSet.Metadata.Name,
+                Tab = action.Tab,
+                Uid = replicaSet.Metadata.Uid,
+                ReplicaSet = replicaSet
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesReplicaSetPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
 using KD.Infrastructure.k8s.ViewModels.Properties;
 
 namespace KD.Infrastructure.k8s.Fluxor.Properties;
@@ -21,25 +22,31 @@ public static partial class Reducers
 
 internal class JobPropertyViewStateEffects
 {
-    private readonly IIndexManager _indexManager;
+    private readonly IViewStateHelper _viewStateHelper;
 
-    public JobPropertyViewStateEffects(IIndexManager indexManager)
+    public JobPropertyViewStateEffects(IViewStateHelper viewStateHelper)
     {
-        _indexManager = indexManager;
+        _viewStateHelper = viewStateHelper;
     }
 
     [EffectMethod]
     public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesJobPropertyAction action, IDispatcher dispatcher)
     {
-        var properties = new JobPropertyViewModel()
-        {
-            Created = DateTime.Now,
-            Name = "test",
-            Tab = action.Tab,
-            Uid = Guid.NewGuid().ToString()
-        };
+        var job = await _viewStateHelper.GetJob(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
 
-        dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
-        dispatcher.Dispatch(new FetchKubernetesJobPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        if (job != null)
+        {
+            var properties = new JobPropertyViewModel()
+            {
+                Created = job.Metadata.CreationTimestamp,
+                Name = job.Metadata.Name,
+                Tab = action.Tab,
+                Uid = job.Metadata.Uid,
+                Job = job
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesJobPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
     }
 }

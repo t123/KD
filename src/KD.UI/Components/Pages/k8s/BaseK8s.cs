@@ -10,10 +10,10 @@ namespace KD.UI.Components.Pages.k8s;
 public class BaseK8s : FluxorComponent
 {
     protected CancellationTokenSource _cancellationTokenSource = new();
-    
+
     [Inject]
     protected IJSRuntime JsRuntime { get; set; }
-    
+
     [Inject]
     public IDispatcher Dispatcher { get; set; }
 
@@ -57,5 +57,4 @@ public class BaseK8s : FluxorComponent
 
             _ => Color.Info
         };
-
 }
