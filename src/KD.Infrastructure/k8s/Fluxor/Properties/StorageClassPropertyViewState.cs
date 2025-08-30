@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record StorageClassPropertyViewState : GenericPropertyFeatureState<StorageClassPropertyViewModel>;
-public record FetchKubernetesStorageClassPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<StorageClassPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesStorageClassPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<StorageClassPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesStorageClassPropertyActionResult(TabModel Tab, StorageClassPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<StorageClassPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

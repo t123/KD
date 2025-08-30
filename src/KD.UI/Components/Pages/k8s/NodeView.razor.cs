@@ -10,7 +10,7 @@ namespace KD.UI.Components.Pages.k8s;
 
 public partial class NodeView : BaseView
 {
-    private IObjectViewModel? _contextRow;
+    private NodeViewModel? _contextRow;
 
     [Inject]
     public IState<NodeViewState> State { get; set; }
@@ -19,14 +19,11 @@ public partial class NodeView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesNodeAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesNodeAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(NodeViewModel viewModel)

@@ -15,8 +15,8 @@ public partial class PodView : BaseView
 {
     private PodViewModel _contextRow;
 
-    public bool ShowInitContainers { get; set; } = false;
-    public bool ShowUnavailableContainers { get; set; } = false;
+    public bool? ShowInitContainers { get; set; } = false;
+    public bool? ShowUnavailableContainers { get; set; } = false;
 
     [Inject]
     public IState<PodViewState> State { get; set; }
@@ -28,14 +28,11 @@ public partial class PodView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesPodAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token)); ;
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesPodAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(PodViewModel viewModel)

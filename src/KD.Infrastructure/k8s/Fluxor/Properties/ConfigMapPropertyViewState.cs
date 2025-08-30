@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record ConfigMapPropertyViewState : GenericPropertyFeatureState<ConfigMapPropertyViewModel>;
-public record FetchKubernetesConfigMapPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ConfigMapPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesConfigMapPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ConfigMapPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesConfigMapPropertyActionResult(TabModel Tab, ConfigMapPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<ConfigMapPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

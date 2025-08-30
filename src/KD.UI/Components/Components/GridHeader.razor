@@ -1,4 +1,4 @@
-﻿@using Humanizer
+﻿@using Humanizer;
 @typeparam T where T : IObjectViewModel
 
 @{
@@ -11,13 +11,20 @@
         @if (OnRefresh.HasDelegate)
         {
             <MudItem>
-                <MudIconButton Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate"  OnClick="@(async (s) => await OnRefresh.InvokeAsync(s))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate" OnClick="@(async (s) => await OnRefresh.InvokeAsync(s))" />
             </MudItem>
         }
         else
         {
             <MudItem>
                 <MudIcon Icon="@Icons.Material.Filled.Refresh" aria-label="refresh" Title="@lastUpdate" @onmouseover="OnMouseOver" />
+            </MudItem>
+        }
+
+        @if (RefreshTimer != null)
+        {
+            <MudItem>
+                <MudText>@Humanizer.TimeSpanHumanizeExtensions.Humanize(RefreshTimer.TimeLeft, minUnit: Humanizer.Localisation.TimeUnit.Second)</MudText>
             </MudItem>
         }
         <MudItem>

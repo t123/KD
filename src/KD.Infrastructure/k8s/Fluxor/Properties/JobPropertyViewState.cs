@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record JobPropertyViewState : GenericPropertyFeatureState<JobPropertyViewModel>;
-public record FetchKubernetesJobPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<JobPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesJobPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<JobPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesJobPropertyActionResult(TabModel Tab, JobPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<JobPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

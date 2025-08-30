@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record IngressClassPropertyViewState : GenericPropertyFeatureState<IngressClassPropertyViewModel>;
-public record FetchKubernetesIngressClassPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<IngressClassPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesIngressClassPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<IngressClassPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesIngressClassPropertyActionResult(TabModel Tab, IngressClassPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<IngressClassPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

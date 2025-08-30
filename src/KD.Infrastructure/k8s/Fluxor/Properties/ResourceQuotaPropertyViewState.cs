@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record ResourceQuotaPropertyViewState : GenericPropertyFeatureState<ResourceQuotaPropertyViewModel>;
-public record FetchKubernetesResourceQuotaPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ResourceQuotaPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesResourceQuotaPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ResourceQuotaPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesResourceQuotaPropertyActionResult(TabModel Tab, ResourceQuotaPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<ResourceQuotaPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

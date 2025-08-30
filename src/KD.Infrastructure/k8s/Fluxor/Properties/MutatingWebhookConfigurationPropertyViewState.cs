@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record MutatingWebhookConfigurationPropertyViewState : GenericPropertyFeatureState<MutatingWebhookConfigurationPropertyViewModel>;
-public record FetchKubernetesMutatingWebhookConfigurationPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<MutatingWebhookConfigurationPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesMutatingWebhookConfigurationPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<MutatingWebhookConfigurationPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesMutatingWebhookConfigurationPropertyActionResult(TabModel Tab, MutatingWebhookConfigurationPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<MutatingWebhookConfigurationPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

@@ -12,7 +12,7 @@ namespace KD.UI.Components.Pages.k8s;
 
 public partial class NamespaceView : BaseView
 {
-    private IObjectViewModel? _contextRow;
+    private NamespaceViewModel? _contextRow;
 
     [Inject]
     public IState<NamespaceViewState> State { get; set; }
@@ -21,14 +21,11 @@ public partial class NamespaceView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesNamespaceAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesNamespaceAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(NamespaceViewModel viewModel)

@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record PodDisruptionBudgetPropertyViewState : GenericPropertyFeatureState<PodDisruptionBudgetPropertyViewModel>;
-public record FetchKubernetesPodDisruptionBudgetPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PodDisruptionBudgetPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesPodDisruptionBudgetPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PodDisruptionBudgetPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesPodDisruptionBudgetPropertyActionResult(TabModel Tab, PodDisruptionBudgetPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<PodDisruptionBudgetPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

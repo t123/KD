@@ -57,4 +57,5 @@ public class BaseK8s : FluxorComponent
 
             _ => Color.Info
         };
+
 }

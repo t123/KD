@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record CustomResourcesDefinitionPropertyViewState : GenericPropertyFeatureState<CustomResourcesDefinitionPropertyViewModel>;
-public record FetchKubernetesCustomResourcesDefinitionPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<CustomResourcesDefinitionPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesCustomResourcesDefinitionPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<CustomResourcesDefinitionPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesCustomResourcesDefinitionPropertyActionResult(TabModel Tab, CustomResourcesDefinitionPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<CustomResourcesDefinitionPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record HorizontalPodAutoscalerPropertyViewState : GenericPropertyFeatureState<HorizontalPodAutoscalerPropertyViewModel>;
-public record FetchKubernetesHorizontalPodAutoscalerPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<HorizontalPodAutoscalerPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesHorizontalPodAutoscalerPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<HorizontalPodAutoscalerPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesHorizontalPodAutoscalerPropertyActionResult(TabModel Tab, HorizontalPodAutoscalerPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<HorizontalPodAutoscalerPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

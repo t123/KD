@@ -479,7 +479,7 @@ internal class ViewStateHelper : IViewStateHelper
                         x.Namespace(),
                         x.Metadata.CreationTimestamp,
                         rules.ToArray(),
-                        x.Status.LoadBalancer.Ingress.Select(x => x.Ip).ToArray()
+                        x.Status?.LoadBalancer?.Ingress?.Select(x => x.Ip).ToArray() ?? []
                     );
                     return model;
                 })

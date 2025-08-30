@@ -21,14 +21,11 @@ public partial class DeploymentView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesDeploymentsAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token)); ;
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesDeploymentsAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(DeploymentViewModel viewModel)

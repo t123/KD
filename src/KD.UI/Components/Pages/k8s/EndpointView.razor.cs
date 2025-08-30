@@ -12,7 +12,7 @@ namespace KD.UI.Components.Pages.k8s;
 
 public partial class EndpointView : BaseView
 {
-    private IObjectViewModel? _contextRow;
+    private EndpointViewModel? _contextRow;
 
     [Inject]
     public IState<EndpointViewState> State { get; set; }
@@ -21,14 +21,11 @@ public partial class EndpointView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesEndpointAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesEndpointAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(EndpointViewModel viewModel)

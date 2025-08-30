@@ -13,6 +13,10 @@ public static class Startup
         serviceCollection.AddSingleton<ContextsManager>();
         serviceCollection.AddTransient<IIndexManager, IndexManager>();
         serviceCollection.AddTransient<IViewStateHelper, ViewStateHelper>();
+#if DEBUG
         serviceCollection.AddTransient<IKubernetesDataLoader, DummyKubernetesDataLoader>();
+#else
+        serviceCollection.AddTransient<IKubernetesDataLoader, KubernetesDataLoader>();
+#endif
     }
 }

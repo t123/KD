@@ -39,3 +39,31 @@ public static class ObjectTypeViewMapping
 }
 
 public record ConditionViewModel(string Type, string Status, string Reason, string Message);
+
+
+public class TimerPlus : System.Timers.Timer
+{
+    private DateTime m_dueTime;
+
+    public TimerPlus() : base() => this.Elapsed += this.ElapsedAction;
+    public TimerPlus(TimeSpan interval) : base(interval) => this.Elapsed += this.ElapsedAction;
+
+    protected new void Dispose()
+    {
+        this.Elapsed -= this.ElapsedAction;
+        base.Dispose();
+    }
+
+    public TimeSpan TimeLeft => (this.m_dueTime - DateTime.Now);
+    public new void Start()
+    {
+        this.m_dueTime = DateTime.Now.AddMilliseconds(this.Interval);
+        base.Start();
+    }
+
+    private void ElapsedAction(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (this.AutoReset)
+            this.m_dueTime = DateTime.Now.AddMilliseconds(this.Interval);
+    }
+}

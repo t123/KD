@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record SecretPropertyViewState : GenericPropertyFeatureState<SecretPropertyViewModel>;
-public record FetchKubernetesSecretPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<SecretPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesSecretPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<SecretPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesSecretPropertyActionResult(TabModel Tab, SecretPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<SecretPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

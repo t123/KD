@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record ServiceAccountPropertyViewState : GenericPropertyFeatureState<ServiceAccountPropertyViewModel>;
-public record FetchKubernetesServiceAccountPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ServiceAccountPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesServiceAccountPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ServiceAccountPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesServiceAccountPropertyActionResult(TabModel Tab, ServiceAccountPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<ServiceAccountPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

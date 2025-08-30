@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record CronJobPropertyViewState : GenericPropertyFeatureState<CronJobPropertyViewModel>;
-public record FetchKubernetesCronJobPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<CronJobPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesCronJobPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<CronJobPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesCronJobPropertyActionResult(TabModel Tab, CronJobPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<CronJobPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

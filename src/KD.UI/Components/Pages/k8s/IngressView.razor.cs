@@ -12,7 +12,7 @@ namespace KD.UI.Components.Pages.k8s;
 
 public partial class IngressView : BaseView
 {
-    private IObjectViewModel? _contextRow;
+    private IngressViewModel? _contextRow;
 
     [Inject]
     public IState<IngressViewState> State { get; set; }
@@ -21,14 +21,11 @@ public partial class IngressView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesIngressAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
-    }
-
-    protected void Fetch()
-    {
-        Dispatcher.Dispatch(new FetchKubernetesIngressAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
     }
 
     private void OpenProperties(IngressViewModel viewModel)

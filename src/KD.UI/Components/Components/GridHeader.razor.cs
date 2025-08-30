@@ -1,10 +1,13 @@
 using KD.Infrastructure.k8s.Fluxor.Objects;
 using KD.Infrastructure.k8s.ViewModels.Objects;
+using KD.UI.Code;
 using Microsoft.AspNetCore.Components;
+
+using Timer = System.Timers.Timer;
 
 namespace KD.UI.Components.Components;
 
-public partial class GridHeader<T> where T : IObjectViewModel
+public partial class GridHeader<T> : IAsyncDisposable where T : IObjectViewModel
 {
     [Parameter]
     public GenericView<T>? View { get; set; }
@@ -30,12 +33,36 @@ public partial class GridHeader<T> where T : IObjectViewModel
     [Parameter]
     public EventCallback<string> OnSearch { get; set; }
 
+    [Parameter]
+    public bool IsRefreshing { get; set; } = false;
+
+    [Parameter]
+    public TimerPlus? RefreshTimer { get; set; }
+
     private async Task TriggerDownload(object e)
     {
     }
 
     private async Task OnMouseOver()
     {
+    }
 
+    private Timer _timer = new Timer(TimeSpan.FromSeconds(1));
+
+    protected override Task OnInitializedAsync()
+    {
+        _timer.AutoReset = true;
+        _timer.Elapsed += (obj, e) => InvokeAsync(StateHasChanged);
+        _timer.Start();
+
+        return base.OnInitializedAsync();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _timer?.Dispose();
+        _timer = null;
+
+        return ValueTask.CompletedTask;
     }
 }

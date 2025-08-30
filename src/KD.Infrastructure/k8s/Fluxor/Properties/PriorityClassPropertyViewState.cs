@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record PriorityClassPropertyViewState : GenericPropertyFeatureState<PriorityClassPropertyViewModel>;
-public record FetchKubernetesPriorityClassPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PriorityClassPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesPriorityClassPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PriorityClassPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesPriorityClassPropertyActionResult(TabModel Tab, PriorityClassPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<PriorityClassPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

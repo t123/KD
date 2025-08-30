@@ -97,7 +97,7 @@
                         <MudSimpleTable Dense="true">
                             <tbody>
                                 @{
-                                    var images = node.Status.Images?.SelectMany(x => x.Names.Select(n => n)) ?? [];
+                                    var images = node.Status.Images?.SelectMany(x => x.Names?.Select(n => n) ?? []) ?? [];
 
                                     foreach (var image in images.OrderBy(x => x).Distinct())
                                     {

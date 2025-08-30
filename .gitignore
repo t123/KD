@@ -9,6 +9,7 @@
 *.userosscache
 *.sln.docstates
 scratch/
+data/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -288,4 +289,3 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
-/data/minikube

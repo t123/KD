@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record PersistentVolumePropertyViewState : GenericPropertyFeatureState<PersistentVolumePropertyViewModel>;
-public record FetchKubernetesPersistentVolumePropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PersistentVolumePropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesPersistentVolumePropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<PersistentVolumePropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesPersistentVolumePropertyActionResult(TabModel Tab, PersistentVolumePropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<PersistentVolumePropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

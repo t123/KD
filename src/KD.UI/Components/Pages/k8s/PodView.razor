@@ -1,61 +1,68 @@
 ﻿@inherits BaseView
 
 <MudElement HtmlTag="div">
-    @if (!State.Value.IsLoading)
+    @if (State.Value.TabMapping.ContainsKey(Tab))
     {
-        if (State.Value.TabMapping.ContainsKey(Tab))
+        var view = State.Value.TabMapping[Tab];
+        var items = view.Items.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
         {
-            var view = State.Value.TabMapping[Tab];
-            var items = view.Items.AsQueryable();
+            items = items.Where(x => x.Name.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase));
+        }
 
-            if (!string.IsNullOrWhiteSpace(SearchText))
-            {
-                items = items.Where(x => x.Name.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase));
-            }
-
-            if (ShowUnavailableContainers)
+        if (ShowUnavailableContainers.HasValue)
+        {
+            if (ShowUnavailableContainers.Value)
             {
                 items = items.Where(x => x.Containers.Any(c => new[] { "Waiting", "Terminated" }.Contains(c.State)));
             }
+            else
+            {
+                items = items.Where(x => !x.Containers.Any(c => new[] { "Waiting", "Terminated" }.Contains(c.State)));
+            }
+        }
 
-            <GridHeader Label="Pods" View="view" OnRefresh="Fetch" ShowSearch="ShowSearch" OnSearch="PerformSearch" ItemCount="@items.Count()">
-                <MudItem>
-                    <MudSwitch T="bool" Label="Init Containers?" @bind-Value="ShowInitContainers" Color="Color.Primary" />
-                </MudItem>
-                <MudItem>
-                    <MudSwitch T="bool" Label="Unavailable Containers?" @bind-Value="ShowUnavailableContainers" Color="Color.Primary" />
-                </MudItem>
-            </GridHeader>
+        <GridHeader Label="Pods" View="view" OnRefresh="Fetch" ShowSearch="ShowSearch" OnSearch="PerformSearch" ItemCount="@items.Count()" RefreshTimer="Timer">
+            <MudItem>
+                <MudCheckBox T="bool?" TriState="true" Label="Init Containers?" @bind-Value="ShowInitContainers" Color="Color.Primary" />
+            </MudItem>
+            <MudItem>
+                <MudCheckBox T="bool?" TriState="true" Color="Color.Primary" Label="Unavailable Containers?" @bind-Value="ShowUnavailableContainers" />
+            </MudItem>
+        </GridHeader>
 
-            <MudDataGrid Items="items" T="PodViewModel" SortMode="SortMode.Single" RowContextMenuClick="ContextMenuClick" Hover="true" ColumnResizeMode="ResizeMode.Column">
-                <Columns>
-                    <TemplateColumn Title="Name" SortBy="x => x.Name" Sortable="true">
-                        <CellTemplate>
-                            <button @onclick="@(() => OpenProperties(context.Item))">
-                                @context.Item.Name
-                            </button>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <PropertyColumn Property="i => i.Namespace" />
-                    <PropertyColumn Property="i => i.NodeName" />
-                    <TemplateColumn Title="Containers">
-                        <CellTemplate>
-                            <ol>
-                                @if (ShowInitContainers)
+        <MudDataGrid Items="items" T="PodViewModel" SortMode="SortMode.Single" RowContextMenuClick="ContextMenuClick" Hover="true" ColumnResizeMode="ResizeMode.Column" FixedHeader="true" Height="@BaseView.TableHeight">
+            <Columns>
+                <TemplateColumn Title="Name" SortBy="x => x.Name" Sortable="true">
+                    <CellTemplate>
+                        <button @onclick="@(() => OpenProperties(context.Item))">
+                            @context.Item.Name
+                        </button>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="i => i.Namespace" />
+                <PropertyColumn Property="i => i.NodeName" />
+                <TemplateColumn Title="Containers">
+                    <CellTemplate>
+                        <ol>
+                            @if (ShowInitContainers.HasValue && ShowInitContainers.Value || !ShowInitContainers.HasValue)
+                            {
+                                @foreach (var container in context.Item.InitContainers)
                                 {
-                                    @foreach (var container in context.Item.InitContainers)
-                                    {
-                                        <li>
-                                            <MudText Color="GetTextIndicatorColor(container.State)">
-                                                * @container.Name - @container.State
-                                                @if (container.State == "Terminated")
-                                                {
-                                                    <text> (@container.ExitCode)</text>
-                                                }
-                                            </MudText>
-                                        </li>
-                                    }
+                                    <li>
+                                        <MudText Color="GetTextIndicatorColor(container.State)">
+                                            * @container.Name - @container.State
+                                            @if (container.State == "Terminated")
+                                            {
+                                                <text> (@container.ExitCode)</text>
+                                            }
+                                        </MudText>
+                                    </li>
                                 }
+                            }
+                            @if (ShowInitContainers.HasValue && !ShowInitContainers.Value || !ShowInitContainers.HasValue)
+                            {
                                 @foreach (var container in context.Item.Containers)
                                 {
                                     <li>
@@ -64,34 +71,34 @@
                                         </MudText>
                                     </li>
                                 }
-                            </ol>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn Title="State">
-                        <CellTemplate>
-                            <MudText Color="@GetTextIndicatorColor(context.Item.Phase)">
-                                @context.Item.Phase
-                            </MudText>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn Title="Restarts">
-                        <CellTemplate>
-                            @{
-                                var containerRestarts = context.Item.Containers.Sum(x => x.RestartCount);
                             }
-                            <MudText Color="@GetTextIndicatorColor(() => containerRestarts == 0)">
-                                @containerRestarts
-                            </MudText>
-                        </CellTemplate>
-                    </TemplateColumn>
-                </Columns>
-            </MudDataGrid>
-            <MudMenu @ref="_contextMenu" PositionAtCursor="true">
-                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Name)">Copy @_contextRow.Name</MudMenuItem>
-                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Namespace)">Copy @_contextRow.Namespace</MudMenuItem>
-                <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="(e) => OpenEditor(Tab, _contextRow.Name, _contextRow.Namespace)">Edit @_contextRow.Name</MudMenuItem>
-                <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error">Delete @_contextRow.Name</MudMenuItem>
-            </MudMenu>
-        }
+                        </ol>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="State">
+                    <CellTemplate>
+                        <MudText Color="@GetTextIndicatorColor(context.Item.Phase)">
+                            @context.Item.Phase
+                        </MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Title="Restarts">
+                    <CellTemplate>
+                        @{
+                            var containerRestarts = context.Item.Containers.Sum(x => x.RestartCount);
+                        }
+                        <MudText Color="@GetTextIndicatorColor(() => containerRestarts == 0)">
+                            @containerRestarts
+                        </MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+        <MudMenu @ref="_contextMenu" PositionAtCursor="true">
+            <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Name)">Copy @_contextRow.Name</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Namespace)">Copy @_contextRow.Namespace</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="(e) => OpenEditor(Tab, _contextRow.Name, _contextRow.Namespace)">Edit @_contextRow.Name</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error">Delete @_contextRow.Name</MudMenuItem>
+        </MudMenu>
     }
 </MudElement>

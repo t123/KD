@@ -2,16 +2,27 @@
 
 <MudDrawer Open="@PropertyViewState.Value.IsOpen" Anchor="Anchor.Right" Variant="DrawerVariant.Persistent" OverlayAutoClose="false" Width="@PropertyViewState.Value.Width" Class="kd-properties">
     <MudStack Row="false">
-        <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" StretchItems="StretchItems.None" Wrap="Wrap.NoWrap">
-            <MudIconButton Icon="@Icons.Material.Outlined.Expand" OnClick="ToggleWindow" Class="rotate-90"></MudIconButton>
-            <MudElement>
-                <MudText>@PropertyViewState.Value.ViewModel?.ObjectPropertyType: </MudText>
-                <MudText Typo="Typo.h6">@PropertyViewState.Value.ViewModel?.Name</MudText>
-            </MudElement>
-            <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy" OnClick="@((e)=>CopyToClipboard(PropertyViewState.Value.ViewModel?.Name))" Class="rotate-90"></MudIconButton>
-            <MudText>@PropertyViewState.Value.LastUpdate</MudText>
-            <MudIconButton Icon="@Icons.Material.Outlined.Close" OnClick="ClosePropertyWindow"></MudIconButton>
-        </MudStack>
+        <MudGrid Justify="Justify.FlexStart" Class="kd-mud-grid align-center">
+            <MudItem>
+                <MudIconButton Icon="@Icons.Material.Outlined.Expand" OnClick="ToggleWindow" Class="rotate-90"></MudIconButton>
+            </MudItem>
+            <MudItem>
+                <MudText>@PropertyViewState.Value.ViewModel?.ObjectPropertyType</MudText>
+            </MudItem>
+            <MudItem>
+                <MudText Typo="Typo.body1">@PropertyViewState.Value.ViewModel?.Name</MudText>
+            </MudItem>
+            <MudItem>
+                <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy" OnClick="@((e) => CopyToClipboard(PropertyViewState.Value.ViewModel?.Name))" Class="rotate-90"></MudIconButton>
+            </MudItem>
+            <MudItem>
+                <MudText>@PropertyViewState.Value.LastUpdate</MudText>
+            </MudItem>
+            <div class="flex-grow-1"></div>
+            <MudItem>
+                <MudIconButton Icon="@Icons.Material.Outlined.Close" OnClick="ClosePropertyWindow"></MudIconButton>
+            </MudItem>
+        </MudGrid>
         <DynamicComponent @ref="_dc" Type="SelectedType" />
     </MudStack>
 </MudDrawer>

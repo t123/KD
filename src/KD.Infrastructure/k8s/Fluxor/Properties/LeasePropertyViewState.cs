@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record LeasePropertyViewState : GenericPropertyFeatureState<LeasePropertyViewModel>;
-public record FetchKubernetesLeasePropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<LeasePropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesLeasePropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<LeasePropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesLeasePropertyActionResult(TabModel Tab, LeasePropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<LeasePropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

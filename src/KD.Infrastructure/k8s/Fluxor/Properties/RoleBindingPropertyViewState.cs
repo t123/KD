@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record RoleBindingPropertyViewState : GenericPropertyFeatureState<RoleBindingPropertyViewModel>;
-public record FetchKubernetesRoleBindingPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<RoleBindingPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesRoleBindingPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<RoleBindingPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesRoleBindingPropertyActionResult(TabModel Tab, RoleBindingPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<RoleBindingPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

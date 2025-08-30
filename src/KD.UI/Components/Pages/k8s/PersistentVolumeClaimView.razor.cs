@@ -1,16 +1,18 @@
 using Fluxor;
+using KD.Infrastructure.k8s;
 using KD.Infrastructure.k8s.Fluxor;
+using KD.Infrastructure.k8s.Fluxor.Misc;
 using KD.Infrastructure.k8s.Fluxor.Objects;
+using KD.Infrastructure.k8s.Fluxor.Properties;
 using KD.Infrastructure.k8s.ViewModels.Objects;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace KD.UI.Components.Pages.k8s;
 
-
 public partial class PersistentVolumeClaimView : BaseView
 {
-    private IObjectViewModel? _contextRow;
+    private PersistentVolumeClaimViewModel? _contextRow;
 
     [Inject]
     public IState<PersistentVolumeClaimViewState> State { get; set; }
@@ -19,23 +21,30 @@ public partial class PersistentVolumeClaimView : BaseView
     {
         base.OnInitialized();
 
+        _refreshAction = () => Dispatcher.Dispatch(new FetchKubernetesPersistentVolumeClaimAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+
         SubscribeToAction<UpdateNamespacesSelectionAction>((action) => Fetch());
 
         Fetch();
     }
 
-    protected void Fetch()
+    private void OpenProperties(PersistentVolumeClaimViewModel viewModel)
     {
-        Dispatcher.Dispatch(new FetchKubernetesPersistentVolumeClaimAction(Tab, NamespacesState.Value.SelectedNamespaces, _cancellationTokenSource.Token));
+        Dispatcher.Dispatch(new OpenPropertiesAction(_cancellationTokenSource.Token));
+        Dispatcher.Dispatch(new FetchKubernetesPersistentVolumeClaimPropertyAction(Tab, viewModel.Name, viewModel.Namespace, _cancellationTokenSource.Token));
     }
 
-    private async Task ContextMenuClick(DataGridRowClickEventArgs<PersistentVolumeClaimViewModel> args)
+    protected async Task ContextMenuClick(DataGridRowClickEventArgs<PersistentVolumeClaimViewModel> args)
     {
         _contextRow = args.Item;
-
         if (_contextMenu != null)
         {
             await _contextMenu.OpenMenuAsync(args.MouseEventArgs);
         }
+    }
+
+    private async Task OpenEditor(TabModel tab, string name, string ns)
+    {
+        Dispatcher.Dispatch(new OpenEditorAction(tab, name, ns, ObjectType.PersistentVolumeClaim));
     }
 }

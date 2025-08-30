@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record EventsPropertyViewState : GenericPropertyFeatureState<EventsPropertyViewModel>;
-public record FetchKubernetesEventsPropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<EventsPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesEventsPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<EventsPropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesEventsPropertyActionResult(TabModel Tab, EventsPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<EventsPropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers

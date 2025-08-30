@@ -5,7 +5,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 
 [FeatureState]
 public record ClusterRolePropertyViewState : GenericPropertyFeatureState<ClusterRolePropertyViewModel>;
-public record FetchKubernetesClusterRolePropertyAction(TabModel Tab, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ClusterRolePropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesClusterRolePropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<ClusterRolePropertyViewModel>(Tab, CancellationToken);
 public record FetchKubernetesClusterRolePropertyActionResult(TabModel Tab, ClusterRolePropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<ClusterRolePropertyViewModel>(Tab, Item, CancellationToken);
 
 public static partial class Reducers
