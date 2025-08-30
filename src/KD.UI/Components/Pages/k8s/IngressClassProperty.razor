@@ -1,28 +1,40 @@
-@using KD.Infrastructure.k8s.ViewModels.Properties
-@inherits FluxorComponent
+@inherits BaseProperty
 
-<div>
+<MudElement HtmlTag="div">
     @{
-        var property = State.Value.Property?.Item;
+        var ingressClass = State.Value.Property?.Item?.IngressClass;
 
-        if (property != null)
+        if (ingressClass != null)
         {
-            <span>Uid: @property.Uid</span>
+            <PropertyHeader T="IngressClassPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@ingressClass.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@ingressClass.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@ingressClass.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@ingressClass.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@ingressClass.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
         }
     }
-</div>
-
-@code {
-    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
-
-    [Inject]
-    public IState<IngressClassPropertyViewState> State { get; set; }
-
-    [Inject]
-    public IDispatcher Dispatcher { get; set; }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-}
+</MudElement>

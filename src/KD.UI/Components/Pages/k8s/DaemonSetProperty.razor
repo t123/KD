@@ -1,28 +1,40 @@
-@using KD.Infrastructure.k8s.ViewModels.Properties
-@inherits FluxorComponent
+@inherits BaseProperty
 
-<div>
+<MudElement HtmlTag="div">
     @{
-        var property = State.Value.Property?.Item;
+        var daemonSet = State.Value.Property?.Item?.DaemonSet;
 
-        if (property != null)
+        if (daemonSet != null)
         {
-            <span>Uid: @property.Uid</span>
+            <PropertyHeader T="DaemonSetPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@daemonSet.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@daemonSet.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@daemonSet.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@daemonSet.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@daemonSet.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
         }
     }
-</div>
-
-@code {
-    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
-
-    [Inject]
-    public IState<DaemonSetPropertyViewState> State { get; set; }
-
-    [Inject]
-    public IDispatcher Dispatcher { get; set; }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-}
+</MudElement>
