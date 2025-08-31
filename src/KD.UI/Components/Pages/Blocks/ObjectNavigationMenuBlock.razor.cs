@@ -9,8 +9,6 @@ namespace KD.UI.Components.Pages.Blocks;
 
 public partial class ObjectNavigationMenuBlock : FluxorComponent
 {
-    private GenericView? _genericView;
-
     [Inject]
     public IState<TabState> TabState { get; set; }
 

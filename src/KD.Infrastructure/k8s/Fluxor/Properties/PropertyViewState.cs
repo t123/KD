@@ -6,9 +6,11 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 [FeatureState]
 public record PropertyViewState
 {
+    public const string SmallWidth = "25%";
+    public const string LargeWidth = "40%";
+
     public bool IsOpen { get; set; } = false;
-    public string Width { get; set; } = "50%";
-    public string Class { get; set; } = "width50";
+    public string Width { get; set; } = LargeWidth;
     public bool IsLoading { get; set; }
     public DateTime? LastUpdate { get; set; }
     public IPropertyViewModel? ViewModel { get; set; } //? 
@@ -18,7 +20,7 @@ public record OpenPropertiesAction(CancellationToken CancellationToken = default
 public record OpenPropertiesActionResult(IPropertyViewModel? Property, CancellationToken CancellationToken = default);
 public record ClosePropertiesAction(CancellationToken CancellationToken = default);
 public record TogglePropertiesAction(string CurrentWidth, CancellationToken CancellationToken = default);
-public record TogglePropertiesActionResult(string Width, string Cls, CancellationToken CancellationToken = default);
+public record TogglePropertiesActionResult(string Width, CancellationToken CancellationToken = default);
 
 public static partial class Reducers
 {
@@ -39,7 +41,7 @@ public static partial class Reducers
 
     [ReducerMethod]
     public static PropertyViewState ReduceTogglePropertiesActionResult(PropertyViewState state, TogglePropertiesActionResult action)
-        => state with { Width = action.Width, Class = action.Cls };
+        => state with { Width = action.Width };
 }
 
 public class PropertyViewStateEffects
@@ -59,26 +61,13 @@ public class PropertyViewStateEffects
     {
         action.CancellationToken.ThrowIfCancellationRequested();
 
-        string newWidth = string.Empty;
-        string newClass = string.Empty;
-        switch (action.CurrentWidth)
+        string newWidth = action.CurrentWidth switch
         {
-            case "25%":
-                newWidth = "50%";
-                newClass = "width50";
-                break;
+            PropertyViewState.SmallWidth => PropertyViewState.LargeWidth,
+            PropertyViewState.LargeWidth => PropertyViewState.SmallWidth,
+            _ => PropertyViewState.LargeWidth
+        };
 
-            case "50%":
-                newWidth = "25%";
-                newClass = "width25";
-                break;
-
-            default:
-                newWidth = "25%";
-                newClass = "width25";
-                break;
-        }
-
-        dispatcher.Dispatch(new TogglePropertiesActionResult(newWidth, newClass));
+        dispatcher.Dispatch(new TogglePropertiesActionResult(newWidth));
     }
 }

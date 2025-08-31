@@ -3,7 +3,14 @@
 
 <MudStack Row="false">
     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Start" StretchItems="StretchItems.None" Wrap="Wrap.NoWrap">
-        <ContextTabBlock />
+        <MudGrid>
+            <MudItem Class="flex-grow-1">
+                <ContextTabBlock />
+            </MudItem>
+            <MudItem>
+                <ContextTabIcons />
+            </MudItem>
+        </MudGrid>
     </MudStack>
     <MudElement HtmlTag="div">
         <ObjectTabBlock />

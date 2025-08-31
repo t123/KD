@@ -1,0 +1,13 @@
+﻿@inherits FluxorComponent
+
+<MudIconButton ButtonType="ButtonType.Button" Icon="@Icons.Material.Filled.Search" OnClick="Search"/>
+
+@code {
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    private void Search(MouseEventArgs args)
+    {
+        Dispatcher.Dispatch(new OpenSearchAction());
+    }
+}
