@@ -57,7 +57,7 @@ public class IndexManager : IIndexManager
 
         if (_examineManager.TryGetIndex(indexName, out var index))
         {
-            foreach (var item in items)
+            foreach (var item in items ?? [])
             {
                 index.IndexItem(ValueSet.FromObject(item.Uid, category, itemType, item));
             }

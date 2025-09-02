@@ -7,7 +7,7 @@ namespace KD.Infrastructure.k8s.Fluxor.Properties;
 public record PropertyViewState
 {
     public const string SmallWidth = "25%";
-    public const string LargeWidth = "40%";
+    public const string LargeWidth = "35%";
 
     public bool IsOpen { get; set; } = false;
     public string Width { get; set; } = LargeWidth;

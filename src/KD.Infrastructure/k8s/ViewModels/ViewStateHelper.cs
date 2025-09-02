@@ -1,5 +1,6 @@
 ﻿using k8s.Models;
 using KD.Infrastructure.k8s.ViewModels.Objects;
+using Microsoft.Extensions.Logging;
 using static KD.Infrastructure.k8s.ViewModels.Objects.ContainerViewModel;
 
 namespace KD.Infrastructure.k8s.ViewModels;
@@ -81,30 +82,53 @@ internal interface IViewStateHelper
 internal class ViewStateHelper : IViewStateHelper
 {
     private readonly IKubernetesDataLoader _dataLoader;
+    private readonly ILogger<ViewStateHelper> _logger;
 
-    public ViewStateHelper(IKubernetesDataLoader dataLoader)
+    public ViewStateHelper(IKubernetesDataLoader dataLoader, ILogger<ViewStateHelper> logger)
     {
         _dataLoader = dataLoader;
+        _logger = logger;
+    }
+
+    private async Task<T?> LogAndExecute<T>(string method, Func<Task<T?>> func)
+    {
+        try
+        {
+            _logger.LogInformation("Executing {Method}", method);
+            var result = await func.Invoke();
+            _logger.LogInformation("Executed {Method}", method);
+            return result;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Execution failed {Method}", method);
+            throw;
+        }
     }
 
     public async Task<IEnumerable<ClusterRoleViewModel>?> GetClusterRoles(Context context, string[] namespaces, CancellationToken cancellationToken)
     {
-        IEnumerable<ClusterRoleViewModel>? items = null;
-
-        try
+        var func = async () =>
         {
-            items = (await _dataLoader.GetClusterRoles(context, namespaces, cancellationToken))
-                .Items
-                .Select(x => new ClusterRoleViewModel(x.Uid(), x.Name(), x.Namespace(), x.CreationTimestamp()))
-                .OrderBy(x => x.Namespace)
-                .ThenBy(x => x.Name);
-        }
-        catch
-        {
-            items = null;
-        }
+            IEnumerable<ClusterRoleViewModel>? items = null;
 
-        return items;
+            try
+            {
+                items = (await _dataLoader.GetClusterRoles(context, namespaces, cancellationToken))
+                    .Items
+                    .Select(x => new ClusterRoleViewModel(x.Uid(), x.Name(), x.Namespace(), x.CreationTimestamp()))
+                    .OrderBy(x => x.Namespace)
+                    .ThenBy(x => x.Name);
+            }
+            catch
+            {
+                items = null;
+            }
+
+            return items;
+        };
+
+        return await LogAndExecute("GetClusterRoles", func);
     }
 
     public async Task<IEnumerable<ClusterRoleBindingViewModel>?> GetClusterRoleBindings(Context context, string[] namespaces, CancellationToken cancellationToken)
@@ -315,32 +339,37 @@ internal class ViewStateHelper : IViewStateHelper
 
     public async Task<IEnumerable<DaemonSetViewModel>?> GetDaemonSets(Context context, string[] namespaces, CancellationToken cancellationToken)
     {
-        IEnumerable<DaemonSetViewModel>? items = null;
-
-        try
+        var func = async () =>
         {
-            items = (await _dataLoader.GetDaemonSets(context, namespaces, cancellationToken))
-                .Items
-                .Select(x => new DaemonSetViewModel(
-                    x.Uid(),
-                    x.Name(),
-                    x.Namespace(),
-                    x.CreationTimestamp(),
-                    x.Status.DesiredNumberScheduled,
-                    x.Status.CurrentNumberScheduled,
-                    x.Status.NumberReady,
-                    x.Status.UpdatedNumberScheduled,
-                    x.Status.NumberAvailable
-                ))
-                .OrderBy(x => x.Namespace)
-                .ThenBy(x => x.Name);
-        }
-        catch
-        {
-            items = null;
-        }
+            IEnumerable<DaemonSetViewModel>? items = null;
 
-        return items;
+            try
+            {
+                items = (await _dataLoader.GetDaemonSets(context, namespaces, cancellationToken))
+                    .Items
+                    .Select(x => new DaemonSetViewModel(
+                        x.Uid(),
+                        x.Name(),
+                        x.Namespace(),
+                        x.CreationTimestamp(),
+                        x.Status.DesiredNumberScheduled,
+                        x.Status.CurrentNumberScheduled,
+                        x.Status.NumberReady,
+                        x.Status.UpdatedNumberScheduled,
+                        x.Status.NumberAvailable
+                    ))
+                    .OrderBy(x => x.Namespace)
+                    .ThenBy(x => x.Name);
+            }
+            catch
+            {
+                items = null;
+            }
+
+            return items;
+        };
+
+        return await LogAndExecute("GetDaemonSets", func);
     }
 
     public async Task<IEnumerable<DeploymentViewModel>?> GetDeployments(Context context, string[] namespaces, CancellationToken cancellationToken)
@@ -1039,7 +1068,9 @@ internal class ViewStateHelper : IViewStateHelper
 
     public async Task<V1ClusterRole?> GetClusterRole(Context context, string ns, string name, CancellationToken cancellationToken)
     {
-        return await _dataLoader.GetClusterRole(context, ns, name, cancellationToken);
+        var func = async () => await _dataLoader.GetClusterRole(context, ns, name, cancellationToken);
+
+        return await LogAndExecute("GetClusterRole", func);
     }
 
     public async Task<V1ConfigMap?> GetConfigMap(Context context, string ns, string name, CancellationToken cancellationToken)

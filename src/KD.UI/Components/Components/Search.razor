@@ -16,7 +16,7 @@
             <MudTabs Outlined="true" Position="Position.Left">
                 <MudTabPanel Text="@($"All ({results.Length})")">
                     <MudStack Row="false" Style="width: 100%">
-                        @foreach (var r in results.OrderByDescending(x => x.Score).Take(15))
+                        @foreach (var r in results.OrderByDescending(x => x.Score))
                         {
                             <SearchResult Result="r" />
                         }
@@ -26,7 +26,7 @@
                 {
                     <MudTabPanel Text="@($"{grouping.Key} ({grouping.Count()})")">
                         <MudStack Row="false" Style="width: 100%">
-                            @foreach (var r in grouping.OrderBy(x => x.Score).Take(15))
+                            @foreach (var r in grouping.OrderBy(x => x.Score))
                             {
                                 <SearchResult Result="r" />
                             }

@@ -1,6 +1,6 @@
 ﻿@inherits BaseView
 
-<MudElement HtmlTag="div">
+<MudElement HtmlTag="div" Class="kd-podview">
     @if (State.Value.TabMapping.ContainsKey(Tab))
     {
         var view = State.Value.TabMapping[Tab];
@@ -50,27 +50,12 @@
                             {
                                 @foreach (var container in context.Item.InitContainers)
                                 {
-                                    <li>
-                                        <MudText Color="GetTextIndicatorColor(container.State)">
-                                            * @container.Name - @container.State
-                                            @if (container.State == "Terminated")
-                                            {
-                                                <text> (@container.ExitCode)</text>
-                                            }
-                                        </MudText>
-                                    </li>
+                                    <K8sPodViewContainer Containers="context.Item.InitContainers" InitContainers="true" OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))" />
                                 }
                             }
                             @if (ShowInitContainers.HasValue && !ShowInitContainers.Value || !ShowInitContainers.HasValue)
                             {
-                                @foreach (var container in context.Item.Containers)
-                                {
-                                    <li>
-                                        <MudText Color="GetTextIndicatorColor(container.State)">
-                                            @container.Name - @container.State
-                                        </MudText>
-                                    </li>
-                                }
+                                <K8sPodViewContainer Containers="context.Item.Containers" InitContainers="false" OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))" />
                             }
                         </ol>
                     </CellTemplate>

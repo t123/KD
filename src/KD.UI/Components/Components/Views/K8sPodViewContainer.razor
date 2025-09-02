@@ -1,0 +1,44 @@
+﻿@inherits BaseView
+
+@{
+    string prepend = InitContainers ? "* " : "";
+}
+
+@foreach (var container in Containers)
+{
+    var color = GetTextIndicatorColor(container.State);
+    string containerName = container.Name;
+    <li>
+        @if (container.State == "Terminated")
+        {
+            <MudText Typo="Typo.body2" Color="@color">
+                <MudElement HtmlTag="div" Style="width: 70px; display: inline-block;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@((e) => OnLogClick(containerName))" />
+                </MudElement>
+                <text>@prepend@containerName - @container.State (@container.ExitCode)</text>
+            </MudText>
+        }
+        else if (container.State == "Running")
+        {
+
+            <MudElement HtmlTag="div">
+                <MudElement HtmlTag="div" Style="width: 70px; display: inline-block;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@((e) => OnLogClick(containerName))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Terminal" OnClick="@((e) => OnTerminalClick(containerName))" />
+                </MudElement>
+                <MudText Typo="Typo.body2" Color="@color" HtmlTag="span">
+                    <text>@prepend@containerName - @container.State</text>
+                </MudText>
+            </MudElement>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Color="@color">
+                <MudElement HtmlTag="div" Style="width: 70px; display: inline-block;">
+                    <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@((e) => OnLogClick(containerName))" />
+                </MudElement>
+                <text>@prepend@containerName - @container.State</text>
+            </MudText>
+        }
+    </li>
+}

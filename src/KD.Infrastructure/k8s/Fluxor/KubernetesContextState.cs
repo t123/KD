@@ -1,4 +1,7 @@
 ﻿using Fluxor;
+using k8s;
+using KD.Infrastructure.k8s.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace KD.Infrastructure.k8s.Fluxor;
 
@@ -53,13 +56,27 @@ public static partial class Reducers
         => state with { IsLoading = false, CurrentContext = action.Context, Contexts = state.Contexts };
 }
 
-public class KubernetesContextStateEffects
+internal class KubernetesContextStateEffects
 {
     private readonly ContextsManager _contextsManager;
+    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IKubernetesDataLoader _dataLoader;
+    private readonly IIndexManager _indexManager;
+    private readonly ILogger<KubernetesContextStateEffects> _logger;
 
-    public KubernetesContextStateEffects(ContextsManager contextsManager)
+    public KubernetesContextStateEffects(
+        ContextsManager contextsManager,
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IKubernetesDataLoader dataLoader,
+        IIndexManager indexManager,
+        ILogger<KubernetesContextStateEffects> logger
+    )
     {
         _contextsManager = contextsManager;
+        _backgroundTaskQueue = backgroundTaskQueue;
+        _dataLoader = dataLoader;
+        _indexManager = indexManager;
+        _logger = logger;
     }
 
     [EffectMethod]
@@ -91,5 +108,19 @@ public class KubernetesContextStateEffects
     {
         var context = _contextsManager.ChangeContext(action.Context);
         dispatcher.Dispatch(new ChangeKubernetesContextActionResult(context));
+
+        if (context != null)
+        {
+            await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async (ct) =>
+            {
+                var pods = await _dataLoader.GetPods(context, [], ct);
+                _logger.LogInformation("Got pods");
+                var ingresses = await _dataLoader.GetIngresses(context, [], ct);
+                _logger.LogInformation("Got ingresses");
+
+                //await _indexManager.IndexItems(context.Name, ObjectType.Pod, pods.Items);
+                //await _indexManager.IndexItems(context.Name, ObjectType.Ingress, ingresses.Items);
+            });
+        }
     }
 }

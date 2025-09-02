@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using MudExtensions.Services;
 using Serilog;
+using Serilog.Events;
 
 namespace KD.UI;
 
@@ -22,8 +23,16 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
 
+        Func<LogEvent, bool> filter = (logEvent) =>
+            logEvent?.Exception?.Source == "WinRT.Runtime" || logEvent?.Exception?.Source == "Lucene.Net"
+                ? true
+                : false;
+
         builder.Services.AddSerilog(
             new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .Filter.ByExcluding(filter)
+                .Enrich.FromLogContext()
                 .WriteTo.File(
                     Path.Combine(FileSystem.Current.AppDataDirectory, "log.txt"),
                     rollingInterval: RollingInterval.Day,
@@ -33,6 +42,7 @@ public static class MauiProgram
                 .CreateLogger()
         );
 
+        builder.Services.AddSingleton<HostedServiceExecutor>();
         builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
@@ -53,6 +63,14 @@ public static class MauiProgram
 
         builder.Services.AddCustomServices();
 
-        return builder.Build();
+        var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var hsExecutor = scope.ServiceProvider.GetRequiredService<HostedServiceExecutor>();
+            hsExecutor.StartAsync(default).GetAwaiter().GetResult();
+        }
+
+        return app;
     }
 }

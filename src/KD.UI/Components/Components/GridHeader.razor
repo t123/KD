@@ -23,8 +23,8 @@
 
         @if (RefreshTimer != null)
         {
-            <MudItem>
-                <MudText>@Humanizer.TimeSpanHumanizeExtensions.Humanize(RefreshTimer.TimeLeft, minUnit: Humanizer.Localisation.TimeUnit.Second)</MudText>
+            <MudItem Style="width: 120px">
+                <MudText HtmlTag="span">@Humanizer.TimeSpanHumanizeExtensions.Humanize(RefreshTimer.TimeLeft, minUnit: Humanizer.Localisation.TimeUnit.Second)</MudText>
             </MudItem>
         }
         <MudItem>

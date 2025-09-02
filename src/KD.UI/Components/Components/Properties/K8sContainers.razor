@@ -1,9 +1,17 @@
 ﻿@using k8s.Models
+@{
+    string podName = Pod.Metadata.Name;
+    string podNamespace = Pod.Metadata.Namespace();
+    string containerName = Container.Name;
+}
 <MudSimpleTable Dense="true">
     <thead>
         <tr class="kd-subheading">
             <th>Name</th>
-            <th colspan="2">@Container.Name</th>
+            <th colspan="2">
+                @Container.Name 
+                <MudIconButton Icon="@Icons.Material.Filled.Terminal" OnClick="@((e) => OpenShell(podNamespace, containerName, podName))" />
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -96,9 +104,4 @@
     </tbody>
 </MudSimpleTable>
 
-@code {
-    [Parameter]
-    public required V1ContainerStatus? StatusContainer { get; set; }
-    [Parameter]
-    public required V1Container Container { get; set; }
-}
+

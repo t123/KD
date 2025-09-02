@@ -7,6 +7,7 @@
 
         if (pod != null)
         {
+            <PropertyHeader T="PodPropertyViewModel" ViewModel="State.Value.Property?.Item" />
             <MudExpansionPanels>
                 <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
                     <MudSimpleTable Dense="true">
@@ -87,7 +88,7 @@
                         @foreach (var container in pod.Spec.InitContainers ?? [])
                         {
                             var status = pod.Status.InitContainerStatuses.SingleOrDefault(x => x.Name == container.Name);
-                            <K8sContainers StatusContainer="status" Container="container" />
+                            <K8sContainers StatusContainer="status" Container="container" Pod="pod"/>
                         }
                     </MudExpansionPanel>
                 }
@@ -97,7 +98,7 @@
                         @foreach (var container in pod.Spec.Containers ?? [])
                         {
                             var status = pod.Status.ContainerStatuses.SingleOrDefault(x => x.Name == container.Name);
-                            <K8sContainers StatusContainer="status" Container="container" />
+                            <K8sContainers StatusContainer="status" Container="container" Pod="pod" />
                         }
                     </MudExpansionPanel>
                 }
@@ -135,7 +136,7 @@
                         pod.Spec?.Affinity?.PodAntiAffinity != null
                         )
                 {
-                    <MudExpansionPanel Text="Affinites" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
+                    <MudExpansionPanel Text="Affinities" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
                         @if (pod.Spec?.Affinity?.NodeAffinity != null)
                         {
                             string yaml = KubernetesYaml.Serialize(pod.Spec.Affinity.NodeAffinity) ?? string.Empty;
@@ -204,7 +205,7 @@
     @*
         public record AffinityViewModel(string Key, string OperatorProperty, IEnumerable<string> Values);
 
-        <MudExpansionPanel Text="Affinites" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
+        <MudExpansionPanel Text="Affinities" Expanded="true" Dense="true" Gutters="false" class="kd-heading">
                     <MudSimpleTable Dense="true">
                         @if (pod.Spec.Affinity.NodeAffinity != null)
                         {

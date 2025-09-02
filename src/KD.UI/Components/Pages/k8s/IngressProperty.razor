@@ -39,7 +39,7 @@
                                 <td>TLS</td>
                                 <td>
                                     <ol>
-                                        @foreach (var tls in ingress.Spec.Tls)
+                                        @foreach (var tls in ingress.Spec.Tls ?? [])
                                         {
                                             <li>@tls.SecretName</li>
                                         }

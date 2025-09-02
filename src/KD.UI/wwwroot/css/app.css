@@ -2,6 +2,10 @@
     --mud-appbar-height: 0 !important;
 }
 
+.kd-podview .mud-icon-button {
+    padding: 0 2px;
+}
+
 .kd-yaml-editor {
     width: 80%;
     height: 800px;
