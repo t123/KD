@@ -50,12 +50,18 @@
                             {
                                 @foreach (var container in context.Item.InitContainers)
                                 {
-                                    <K8sPodViewContainer Containers="context.Item.InitContainers" InitContainers="true" OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))" />
+                                    <K8sPodViewContainer Containers="context.Item.InitContainers"
+                                                         InitContainers="true"
+                                                         OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))"
+                                                         OnLogViewClicked="@((e) => OpenLogViewer(Tab, context.Item.Namespace, e, context.Item.Name))" />
                                 }
                             }
                             @if (ShowInitContainers.HasValue && !ShowInitContainers.Value || !ShowInitContainers.HasValue)
                             {
-                                <K8sPodViewContainer Containers="context.Item.Containers" InitContainers="false" OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))" />
+                                <K8sPodViewContainer Containers="context.Item.Containers"
+                                                     InitContainers="false"
+                                                     OnShellClicked="@((e) => OpenShell(context.Item.Namespace, e, context.Item.Name))"
+                                                     OnLogViewClicked="@((e) => OpenLogViewer(Tab, context.Item.Namespace, e, context.Item.Name))" />
                             }
                         </ol>
                     </CellTemplate>

@@ -25,6 +25,7 @@ public record TabModel(Config ConfigState, Context ContextState, string ObjectVi
 public record AddTabAction(Config ConfigState, Context ContextState, string ObjectViewType);
 public record AddTabActionResult(Config ConfigState, Context ContextState, string ObjectViewType);
 public record CloseTabAction(TabModel Tab);
+public record CloseAllTabsAction();
 
 public static partial class Reducers
 {
@@ -55,5 +56,11 @@ public static partial class Reducers
 
         var newTabs = state.Tabs.Where(x => x.Name != exists.Name).ToArray();
         return state with { Tabs = newTabs };
+    }
+
+    [ReducerMethod]
+    public static TabState ReduceHandleCloseAllTabsActionResult(TabState state, CloseAllTabsAction action)
+    {
+        return state with { Tabs = [] };
     }
 }

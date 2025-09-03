@@ -5,7 +5,7 @@
 @using BlazorMonaco.Editor
 @using BlazorMonaco.Languages
 
-<MudPopover @bind-Open="EditorState.Value.IsOpen" Fixed="true" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" Class="kd-yaml-editor">
+<MudPopover Open="EditorState.Value.IsOpen" Fixed="true" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" Class="kd-yaml-editor">
     <MudButton OnClick="CloseEditor">Close</MudButton>
     <MudElement HtmlTag="div" Style="height: 100%;">
         <StandaloneCodeEditor @ref="_standaloneCodeEditor" Id="yaml-editor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnDidInit" />

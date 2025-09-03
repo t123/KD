@@ -14,6 +14,8 @@ public partial class K8sPodViewContainer : BaseView
 
     [Parameter]
     public required EventCallback<string> OnShellClicked { get; set; }
+    [Parameter]
+    public required EventCallback<string> OnLogViewClicked { get; set; }
 
     private async Task OnTerminalClick(string containerName)
     {
@@ -22,6 +24,6 @@ public partial class K8sPodViewContainer : BaseView
 
     private async Task OnLogClick(string containerName)
     {
-        await OnShellClicked.InvokeAsync(containerName);
+        await OnLogViewClicked.InvokeAsync(containerName);
     }
 }

@@ -2,7 +2,6 @@ using KD.Infrastructure.k8s.Fluxor.Objects;
 using KD.Infrastructure.k8s.ViewModels.Objects;
 using KD.UI.Code;
 using Microsoft.AspNetCore.Components;
-
 using Timer = System.Timers.Timer;
 
 namespace KD.UI.Components.Components;
@@ -61,7 +60,6 @@ public partial class GridHeader<T> : IAsyncDisposable where T : IObjectViewModel
     public ValueTask DisposeAsync()
     {
         _timer?.Dispose();
-        _timer = null;
 
         return ValueTask.CompletedTask;
     }

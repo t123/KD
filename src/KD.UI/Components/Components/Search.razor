@@ -1,7 +1,7 @@
 ﻿@inherits FluxorComponent
 @using static KD.Infrastructure.k8s.Fluxor.Misc.SearchViewState
 
-<MudPopover @bind-Open="@SearchViewState.Value.IsOpen" Fixed="true" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" RelativeWidth="DropdownWidth.Relative">
+<MudPopover Open="@SearchViewState.Value.IsOpen" Fixed="true" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" RelativeWidth="DropdownWidth.Relative">
     <MudStack>
         <MudElement>
             <MudTextField Value="@TextValue" ShrinkLabel="true" Label="Search for..." Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" OnKeyUp="KeyUp" ValueChanged="@((e) => TextChanged(e))" T="string" AutoFocus="true"></MudTextField>

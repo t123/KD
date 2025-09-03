@@ -56,6 +56,11 @@ public partial class PodView : BaseView
         Dispatcher.Dispatch(new OpenEditorAction(tab, name, ns, ObjectType.Pod));
     }
 
+    private async Task OpenLogViewer(TabModel tab, string ns, string containerName, string name)
+    {
+        Dispatcher.Dispatch(new OpenLogViewerAction(tab, name, ns, containerName, null));
+    }
+
     private void OpenShell(string ns, string containerName, string name)
     {
         var args = @$"exec -i -t -n {ns} {name} -c {containerName} -- sh -c ""clear; (bash || ash ||sh)""";
