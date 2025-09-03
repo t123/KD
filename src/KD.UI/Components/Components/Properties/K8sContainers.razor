@@ -1,0 +1,107 @@
+﻿@using k8s.Models
+@{
+    string podName = Pod.Metadata.Name;
+    string podNamespace = Pod.Metadata.Namespace();
+    string containerName = Container.Name;
+}
+<MudSimpleTable Dense="true">
+    <thead>
+        <tr class="kd-subheading">
+            <th>Name</th>
+            <th colspan="2">
+                @Container.Name 
+                <MudIconButton Icon="@Icons.Material.Filled.Terminal" OnClick="@((e) => OpenShell(podNamespace, containerName, podName))" />
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Status</td>
+            <td colspan="2">
+                @{
+                    var result = new string[] {
+                                StatusContainer?.State?.Waiting==null ? "" : $"Waiting {StatusContainer.State.Waiting.Reason}",
+                                StatusContainer?.State?.Running==null ? "" : $"Running",
+                                StatusContainer?.State?.Terminated==null ? "": $"Terminated - {StatusContainer.State.Terminated.Reason} ({StatusContainer.State.Terminated.ExitCode})"
+                                };
+
+                    var text = string.Join(", ", result.Where(x => !string.IsNullOrWhiteSpace(x)));
+                }
+                @text
+            </td>
+        </tr>
+        <tr>
+            <td>Image</td>
+            <td colspan="2">@Container.Image</td>
+        </tr>
+        <tr>
+            <td>Image Pull Policy</td>
+            <td colspan="2">@Container.ImagePullPolicy</td>
+        </tr>
+        <tr>
+            <td>Requests</td>
+            <td colspan="2">
+                @if (Container?.Resources?.Requests != null)
+                {
+                    @foreach (var kvp in Container.Resources.Requests)
+                    {
+                        @kvp.Key
+
+                        <text>: </text>
+                        @kvp.Value
+
+                        <text>, </text>
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Limits</td>
+            <td colspan="2">
+                @if (Container?.Resources?.Limits != null)
+                {
+                    foreach (var kvp in Container.Resources.Limits)
+                    {
+                        @kvp.Key
+
+                        <text>: </text>
+                        @kvp.Value
+
+                        <text>, </text>
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Command</td>
+            <td colspan="2">@string.Join(" ", Container.Command ?? [])</td>
+        </tr>
+        <tr>
+            <td>Args</td>
+            <td colspan="2">@string.Join(" ", Container.Args ?? [])</td>
+        </tr>
+        <tr class="kd-subheading">
+            <td colspan="3">Volumes</td>
+        </tr>
+        @foreach (var v in Container?.VolumeMounts ?? [])
+        {
+            <tr>
+                <td>@v.Name</td>
+                <td>@v.MountPath</td>
+                <td>@((v.ReadOnlyProperty ?? false) ? "r" : "rw")</td>
+            </tr>
+        }
+        <tr class="kd-subheading">
+            <td colspan="3">Environment Variables</td>
+        </tr>
+        @foreach (var e in (Container?.Env ?? []).OrderBy(x => x.Name?.ToUpperInvariant()))
+        {
+            <tr>
+                <td>@e.Name</td>
+                <td colspan="2">@e.Value</td>
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+
+

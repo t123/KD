@@ -1,0 +1,114 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var endpoint = State.Value.Property?.Item?.Endpoint;
+
+        if (endpoint != null)
+        {
+            <PropertyHeader T="EndpointPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@endpoint.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@endpoint.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@endpoint.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@endpoint.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@endpoint.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+                @if (endpoint.Subsets?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Subnets" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                        @{
+                            int i = 0;
+
+                            foreach (var ep in endpoint.Subsets)
+                            {
+                                i++;
+
+                                <MudSimpleTable Dense="true">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="5" class="kd-subheading">Subnet #@i</th>
+                                        </tr>
+                                    </thead>
+                                    <thead>
+                                        <tr>
+                                            <th>&nbsp;</th>
+                                            <th>IP</th>
+                                            <th>Hostname</th>
+                                            <th>Target</th>
+                                            <th>Node</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var a in ep?.Addresses ?? [])
+                                        {
+                                            <tr>
+                                                <td><MudText Color="Color.Success">Ready</MudText></td>
+                                                <td>@a.Ip</td>
+                                                <td>@a.Hostname</td>
+                                                <td>@a.TargetRef.Kind @a.TargetRef.Name</td>
+                                                <td>@a.NodeName</td>
+                                            </tr>
+                                        }
+                                        @foreach (var a in ep?.NotReadyAddresses ?? [])
+                                        {
+                                            <tr>
+                                                <td><MudText Color="Color.Warning">Not Ready</MudText></td>
+                                                <td>@a.Ip</td>
+                                                <td>@a.Hostname</td>
+                                                <td>@a.TargetRef.Kind @a.TargetRef.Name</td>
+                                                <td>@a.NodeName</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                                <MudElement HtmlTag="div" Style="padding-bottom: 20px"></MudElement>
+                                <MudSimpleTable Dense="true">
+                                    <thead>
+                                        <tr>
+                                            <th>Port</th>
+                                            <th>Protocol</th>
+                                            <th>Name</th>
+                                            <th>App Protocol</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var p in ep?.Ports ?? [])
+                                        {
+                                            <tr>
+                                                <td>@p.Port</td>
+                                                <td>@p.Protocol</td>
+                                                <td>@p.Name</td>
+                                                <td>@p.AppProtocol</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </MudSimpleTable>
+                            }
+                        }
+                    </MudExpansionPanel>
+                }
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

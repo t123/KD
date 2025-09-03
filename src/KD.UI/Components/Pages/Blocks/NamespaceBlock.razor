@@ -1,0 +1,72 @@
+﻿@inherits FluxorComponent
+
+<MudElement Class="flex-grow-0">
+    @if (!State.Value.IsLoading)
+    {
+        <ComboBox T="string" Value="@State.Value.Selected" ValueChanged="OnValueChanged" Dense="Dense.Comfort"
+                  MultiSelection="true" Editable="true" ShowCheckbox="true" SelectAll="true"
+                  ItemPresenter="ValuePresenter.ItemContent" Clearable="true" InputPresenter="ValuePresenter.ItemContent">
+            <ItemTemplate>
+                @{
+                    var first = State.Value.SelectedNamespaces.FirstOrDefault();
+
+                    if (first != null)
+                    {
+                        <text>
+                            @first <MudChip T="string" Text="@State.Value.SelectedNamespaces.Length.ToString()" Color="Color.Info" Size="Size.Small"></MudChip>
+                        </text>
+                    }
+                }
+            </ItemTemplate>
+            <ChildContent>
+                @{
+                    var namespaces = State.Value.SelectedNamespaces
+                            .Concat(State.Value.Namespaces.Where(ns => !State.Value.SelectedNamespaces.Contains(ns)))
+                            .ToArray();
+                }
+                @foreach (var ns in State.Value.Namespaces)
+                {
+                    <ComboBoxItem T="string" Value="@ns">
+                        <ChildContent>
+                            <MudElement HtmlTag="div" Class="d-flex width-100">
+                                <MudLink OnClick="@((e) => ItemClicked(ns))" Typo="Typo.body2" Color="Color.Default" Class="mud-palette-text-secondary width-100" Underline="Underline.None" Style="display:inline-block">@ns</MudLink>
+                                <MudIconButton Icon="@Icons.Material.Filled.PushPin" Size="Size.Small" Color="Color.Error" OnClick="@((e) => ItemClicked(ns))" Class="ml-auto rotate-45"></MudIconButton>
+                            </MudElement>
+                        </ChildContent>
+                    </ComboBoxItem>
+                }
+            </ChildContent>
+        </ComboBox>
+    }
+</MudElement>
+
+@code {
+    private CancellationTokenSource CancellationTokenSource { get; set; } = new();
+
+    [Inject]
+    public IState<NamespacesConfigState> State { get; set; }
+
+    [Inject]
+    public IDispatcher Dispatcher { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<ChangeKubernetesContextActionResult>((action) =>
+        {
+            Dispatcher.Dispatch(new FetchNamespacesConfigAction(action.Context, CancellationTokenSource.Token));
+        });
+
+        // SubscribeToAction<FetchNamespacesConfigResultAction>((action) => this.StateHasChanged());
+    }
+
+    protected void OnValueChanged(string namespaces)
+    {
+        Dispatcher.Dispatch(new UpdateNamespacesSelectionAction(namespaces));
+    }
+
+    protected void ItemClicked(string ns)
+    {
+        return;
+    }
+}

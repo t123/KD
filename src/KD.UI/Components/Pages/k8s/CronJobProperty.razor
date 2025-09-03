@@ -1,0 +1,40 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var cronJob = State.Value.Property?.Item?.CronJob;
+
+        if (cronJob != null)
+        {
+            <PropertyHeader T="CronJobPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@cronJob.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@cronJob.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@cronJob.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@cronJob.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@cronJob.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

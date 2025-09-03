@@ -1,0 +1,40 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var daemonSet = State.Value.Property?.Item?.DaemonSet;
+
+        if (daemonSet != null)
+        {
+            <PropertyHeader T="DaemonSetPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@daemonSet.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@daemonSet.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@daemonSet.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@daemonSet.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@daemonSet.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

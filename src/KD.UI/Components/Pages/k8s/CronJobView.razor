@@ -1,0 +1,43 @@
+﻿@inherits BaseView
+
+<MudElement HtmlTag="div">
+    @if (State.Value.TabMapping.ContainsKey(Tab))
+    {
+        var view = State.Value.TabMapping[Tab];
+        var items = view.Items.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            items = items.Where(x => x.Name.Contains(SearchText, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        <GridHeader Label="Cron Jobs" View="view" OnRefresh="Fetch" OnSearch="PerformSearch" ItemCount="@items.Count()" RefreshTimer="Timer">
+        </GridHeader>
+        <MudDataGrid Items="items" T="CronJobViewModel" SortMode="SortMode.Single" RowContextMenuClick="ContextMenuClick" Hover="true" FixedHeader="true" Height="@BaseView.TableHeight">
+            <Columns>
+                <TemplateColumn Title="Name" SortBy="x => x.Name" Sortable="true">
+                    <CellTemplate>
+                        <button @onclick="@(() => OpenProperties(context.Item))">
+                            @context.Item.Name
+                        </button>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.Namespace"></PropertyColumn>
+                <PropertyColumn Property="x => x.TimeZone"></PropertyColumn>
+                <PropertyColumn Property="x => x.Schedule"></PropertyColumn>
+                <PropertyColumn Property="x => x.Suspend"></PropertyColumn>
+                <PropertyColumn Property="x => x.Active"></PropertyColumn>
+                <PropertyColumn Property="x => x.LastSuccessfulTime"></PropertyColumn>
+            </Columns>
+        </MudDataGrid>
+        <MudMenu @ref="_contextMenu" PositionAtCursor="true">
+            @if (_contextRow != null)
+            {
+                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Name)">Copy @_contextRow.Name</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Outlined.ContentCopy" OnClick="(e) => CopyToClipboard(_contextRow.Namespace)">Copy @_contextRow.Namespace</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Outlined.Edit" OnClick="(e) => OpenEditor(Tab, _contextRow.Name, _contextRow.Namespace)">Edit @_contextRow.Name</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error">Delete @_contextRow.Name</MudMenuItem>
+            }
+        </MudMenu>
+    }
+</MudElement>

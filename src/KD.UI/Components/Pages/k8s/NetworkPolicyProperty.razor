@@ -1,0 +1,40 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var networkPolicy = State.Value.Property?.Item?.NetworkPolicy;
+
+        if (networkPolicy != null)
+        {
+            <PropertyHeader T="NetworkPolicyPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@networkPolicy.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@networkPolicy.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@networkPolicy.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@networkPolicy.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@networkPolicy.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

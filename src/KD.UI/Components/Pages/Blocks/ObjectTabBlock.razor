@@ -1,0 +1,14 @@
+﻿@inherits FluxorComponent
+
+@if (TabState.Value.Tabs.Length > 0)
+{
+    <MudDynamicTabs CloseTab="CloseTab" @ref="_mdt" Border="true" Class="kd-tab-navigation" AddIconStyle="transform: rotate(45deg)" AddTab="CloseAll" AddIconToolTip="Close All">
+        @foreach (var tab in TabState.Value.Tabs)
+        {
+            <MudTabPanel ID="@tab" Text="@tab.Name" ShowCloseIcon="true" BadgeData='string.Empty' BadgeDot="true">
+                <GenericView @ref="_genericView" Tab="@tab" />
+            </MudTabPanel>
+        }
+    </MudDynamicTabs>
+}
+

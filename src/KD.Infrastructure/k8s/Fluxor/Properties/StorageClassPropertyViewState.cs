@@ -1,0 +1,52 @@
+using Fluxor;
+using KD.Infrastructure.k8s.ViewModels;
+using KD.Infrastructure.k8s.ViewModels.Properties;
+
+namespace KD.Infrastructure.k8s.Fluxor.Properties;
+
+[FeatureState]
+public record StorageClassPropertyViewState : GenericPropertyFeatureState<StorageClassPropertyViewModel>;
+public record FetchKubernetesStorageClassPropertyAction(TabModel Tab, string Name, string Namespace, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyAction<StorageClassPropertyViewModel>(Tab, CancellationToken);
+public record FetchKubernetesStorageClassPropertyActionResult(TabModel Tab, StorageClassPropertyViewModel Item, CancellationToken CancellationToken = default) : FetchKubernetesGenericPropertyActionResult<StorageClassPropertyViewModel>(Tab, Item, CancellationToken);
+
+public static partial class Reducers
+{
+    [ReducerMethod]
+    public static StorageClassPropertyViewState ReduceFetchKubernetesStorageClassPropertyAction(StorageClassPropertyViewState state, FetchKubernetesStorageClassPropertyAction action)
+        => (FetchStateBegin(state, action) as StorageClassPropertyViewState)!;
+
+    [ReducerMethod]
+    public static StorageClassPropertyViewState ReduceFetchKubernetesStorageClassPropertyActionResult(StorageClassPropertyViewState state, FetchKubernetesStorageClassPropertyActionResult action)
+        => (FetchStateResult(state, action) as StorageClassPropertyViewState)!;
+}
+
+internal class StorageClassPropertyViewStateEffects
+{
+    private readonly IViewStateHelper _viewStateHelper;
+
+    public StorageClassPropertyViewStateEffects(IViewStateHelper viewStateHelper)
+    {
+        _viewStateHelper = viewStateHelper;
+    }
+
+    [EffectMethod]
+    public async Task HandleFetchKubernetesGenericPropertyAction(FetchKubernetesStorageClassPropertyAction action, IDispatcher dispatcher)
+    {
+        var storageClass = await _viewStateHelper.GetStorageClass(action.Tab.ContextState, action.Namespace, action.Name, action.CancellationToken);
+
+        if (storageClass != null)
+        {
+            var properties = new StorageClassPropertyViewModel()
+            {
+                Created = storageClass.Metadata.CreationTimestamp,
+                Name = storageClass.Metadata.Name,
+                Tab = action.Tab,
+                Uid = storageClass.Metadata.Uid,
+                StorageClass = storageClass
+            };
+
+            dispatcher.Dispatch(new OpenPropertiesActionResult(properties, action.CancellationToken));
+            dispatcher.Dispatch(new FetchKubernetesStorageClassPropertyActionResult(action.Tab, properties, action.CancellationToken));
+        }
+    }
+}

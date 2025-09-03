@@ -1,0 +1,7 @@
+﻿@inherits BaseProperty
+
+<MudDrawer Open="@PropertyViewState.Value.IsOpen" Anchor="Anchor.Right" Variant="DrawerVariant.Persistent" OverlayAutoClose="false" Width="@PropertyViewState.Value.Width" Class="kd-properties">
+    <MudStack Row="false">
+        <DynamicComponent @ref="_dc" Type="SelectedType" />
+    </MudStack>
+</MudDrawer>

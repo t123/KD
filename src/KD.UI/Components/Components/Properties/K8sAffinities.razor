@@ -1,0 +1,22 @@
+﻿@* @if (Affinities?.Any() ?? false)
+{
+    <tr class="kd-subheading">
+        <td colspan="3">@Title</td>
+    </tr>
+    @foreach (var a in Affinities ?? [])
+    {
+        <tr>
+            <td>@a.Key</td>
+            <td>@a.OperatorProperty</td>
+            <td>@string.Join(",", @a.Values ?? [])</td>
+        </tr>
+    }
+}
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public IEnumerable<AffinityViewModel>? Affinities { get; set; }
+}
+ *@

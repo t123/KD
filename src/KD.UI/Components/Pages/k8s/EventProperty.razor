@@ -1,0 +1,13 @@
+@inherits BaseProperty
+
+<div>
+    @{
+        var property = State.Value.Property?.Item;
+
+        if (property != null)
+        {
+            <span>Uid: @property.Uid</span>
+        }
+    }
+</div>
+

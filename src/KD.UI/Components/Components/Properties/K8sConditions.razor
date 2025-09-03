@@ -1,0 +1,16 @@
+﻿@using k8s.Models
+@if (Conditions?.Any() ?? false)
+{
+    <MudChipSet T="string" SelectionMode="SelectionMode.ToggleSelection">
+        @foreach (var c in Conditions ?? [])
+        {
+            var colour = c.Status == "True" ? Color.Success : Color.Warning;
+            <MudChip Size="Size.Small" Variant="Variant.Text" Color="@colour" Value="@c.Type">@c.Type</MudChip>
+        }
+    </MudChipSet>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<ConditionViewModel>? Conditions { get; set; }
+}

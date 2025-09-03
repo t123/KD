@@ -1,0 +1,40 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var mutatingWebhookConfiguration = State.Value.Property?.Item?.MutatingWebhookConfiguration;
+
+        if (mutatingWebhookConfiguration != null)
+        {
+            <PropertyHeader T="MutatingWebhookConfigurationPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@mutatingWebhookConfiguration.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@mutatingWebhookConfiguration.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@mutatingWebhookConfiguration.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@mutatingWebhookConfiguration.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@mutatingWebhookConfiguration.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

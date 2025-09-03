@@ -1,0 +1,152 @@
+@using System.Collections.Immutable
+@using global::k8s.Models
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var node = State.Value.Property?.Item?.Node;
+
+        if (node != null)
+        {
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@node.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@node.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@node.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@node.Metadata.Annotations" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+                @{
+                    var info = node.Status.NodeInfo;
+
+                    if (info != null)
+                    {
+                        <MudExpansionPanel Text="System Information" Expanded="false" Dense="true" Gutters="false" Class="kd-heading">
+                            <MudSimpleTable Dense="true">
+                                <tbody>
+                                    <tr>
+                                        <td>Architecture</td>
+                                        <td>@info.Architecture</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BootID</td>
+                                        <td>@info.BootID</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ContainerRuntimeVersion</td>
+                                        <td>@info.ContainerRuntimeVersion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>KernelVersion</td>
+                                        <td>@info.KernelVersion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>KubeletVersion</td>
+                                        <td>@info.KubeletVersion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>KubeProxyVersion</td>
+                                        <td>@info.KubeProxyVersion</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MachineID</td>
+                                        <td>@info.MachineID</td>
+                                    </tr>
+                                    <tr>
+                                        <td>OperatingSystem</td>
+                                        <td>@info.OperatingSystem</td>
+                                    </tr>
+                                    <tr>
+                                        <td>OsImage</td>
+                                        <td>@info.OsImage</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SystemUUID</td>
+                                        <td>@info.SystemUUID</td>
+                                    </tr>
+                                    @if (info.Swap != null)
+                                    {
+                                        <tr>
+                                            <td>Swap Capacity</td>
+                                            <td>@info.Swap.Capacity</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </MudSimpleTable>
+                        </MudExpansionPanel>
+                    }
+                }
+                @if (node.Status.Images?.Any() ?? false)
+                {
+                    <MudExpansionPanel Text="Images" Expanded="false" Dense="true" Gutters="false" Class="kd-heading">
+                        <MudSimpleTable Dense="true">
+                            <tbody>
+                                @{
+                                    var images = node.Status.Images?.SelectMany(x => x.Names?.Select(n => n) ?? []) ?? [];
+
+                                    foreach (var image in images.OrderBy(x => x).Distinct())
+                                    {
+                                        <tr>
+                                            <td>
+                                                @image
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudExpansionPanel>
+                }
+                <MudExpansionPanel Text="Resources" Expanded="false" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="kd-subheading">Capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in node?.Status?.Capacity ?? ImmutableDictionary<string, ResourceQuantity>.Empty)
+                            {
+                                <tr>
+                                    <td>@item.Key</td>
+                                    <td>@item.Value.CanonicalizeString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                    <MudSimpleTable Dense="true">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="kd-subheading">Allocatable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in node?.Status?.Allocatable ?? ImmutableDictionary<string, ResourceQuantity>.Empty)
+                            {
+                                <tr>
+                                    <td>@item.Key</td>
+                                    <td>@item.Value.CanonicalizeString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>

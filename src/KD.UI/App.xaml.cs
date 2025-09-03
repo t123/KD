@@ -1,15 +1,21 @@
-﻿namespace KD.UI
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+﻿using Microsoft.Extensions.Logging;
 
-        protected override Window CreateWindow(IActivationState? activationState)
+namespace KD.UI;
+
+public partial class App : Application
+{
+    public App(ILogger<App> logger)
+    {
+        AppDomain.CurrentDomain.FirstChanceException += (sender, error) =>
         {
-            return new Window(new MainPage()) { Title = "KD.UI" };
-        }
+            logger.LogError(error?.Exception, error?.Exception?.Message);
+        };
+
+        InitializeComponent();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new MainPage()) { Title = "KD" };
     }
 }

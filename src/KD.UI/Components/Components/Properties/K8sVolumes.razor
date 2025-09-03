@@ -1,0 +1,344 @@
+﻿@using k8s.Models
+
+<tr class="kd-subheading">
+    <td>Name</td>
+    <td>@Volume.Name</td>
+</tr>
+@if (Volume.AwsElasticBlockStore != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>AwsElasticBlockStore</td>
+    </tr>
+    <tr>
+        <td>Volume ID</td>
+        <td>@Volume.AwsElasticBlockStore.VolumeID</td>
+    </tr>
+}
+
+@if (Volume.AzureDisk != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>AzureDisk</td>
+    </tr>
+    <tr>
+        <td>Kind</td>
+        <td>@Volume.AzureDisk.Kind</td>
+    </tr>
+    <tr>
+        <td>Disk Name</td>
+        <td>@Volume.AzureDisk.DiskName</td>
+    </tr>
+    <tr>
+        <td>Disk URI</td>
+        <td>@Volume.AzureDisk.DiskURI</td>
+    </tr>
+}
+
+@if (Volume.AzureFile != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>AzureFile</td>
+    </tr>
+    <tr>
+        <td>Kind</td>
+        <td>@Volume.AzureFile.ReadOnlyProperty</td>
+    </tr>
+    <tr>
+        <td>SecretName</td>
+        <td>@Volume.AzureFile.SecretName</td>
+    </tr>
+    <tr>
+        <td>ShareName</td>
+        <td>@Volume.AzureFile.ShareName</td>
+    </tr>
+}
+
+@if (Volume.Cephfs != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Cephfs</td>
+    </tr>
+    <tr>
+        <td>ReadOnlyProperty</td>
+        <td>@Volume.Cephfs.ReadOnlyProperty</td>
+    </tr>
+    <tr>
+        <td>Path</td>
+        <td>@Volume.Cephfs.Path</td>
+    </tr>
+}
+
+@if (Volume.Cinder != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Cinder</td>
+    </tr>
+    <tr>
+        <td>ReadOnlyProperty</td>
+        <td>@Volume.Cinder.ReadOnlyProperty</td>
+    </tr>
+    <tr>
+        <td>FsType</td>
+        <td>@Volume.Cinder.FsType</td>
+    </tr>
+    <tr>
+        <td>VolumeID</td>
+        <td>@Volume.Cinder.VolumeID</td>
+    </tr>
+}
+
+@if (Volume.ConfigMap != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>ConfigMap</td>
+    </tr>
+    <tr>
+        <td>Default Mode</td>
+        <td>@Volume.ConfigMap.DefaultMode</td>
+    </tr>
+    @foreach (var item in Volume.ConfigMap.Items ?? [])
+    {
+        <tr>
+            <td>@item.Key</td>
+            <td>@item.Path @item.Mode</td>
+        </tr>
+    }
+}
+
+@if (Volume.Csi != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Csi</td>
+    </tr>
+}
+
+@if (Volume.DownwardAPI != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>DownwardAPI</td>
+    </tr>
+}
+
+@if (Volume.EmptyDir != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Empty Dir</td>
+    </tr>
+    <tr>
+        <td>Medium</td>
+        <td>@Volume.EmptyDir.Medium</td>
+    </tr>
+    <tr>
+        <td>Size Limit</td>
+        <td>@Volume.EmptyDir.SizeLimit?.CanonicalizeString()</td>
+    </tr>
+}
+
+@if (Volume.Ephemeral != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Ephemeral</td>
+    </tr>
+}
+
+@if (Volume.Fc != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Fc</td>
+    </tr>
+}
+
+@if (Volume.FlexVolume != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>FlexVolume</td>
+    </tr>
+}
+
+@if (Volume.Flocker != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Flocker</td>
+    </tr>
+}
+
+@if (Volume.GcePersistentDisk != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>GcePersistentDisk</td>
+    </tr>
+}
+
+@if (Volume.GitRepo != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>GitRepo</td>
+    </tr>
+}
+
+@if (Volume.Glusterfs != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Glusterfs</td>
+    </tr>
+}
+
+@if (Volume.HostPath != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>HostPath</td>
+    </tr>
+}
+
+@if (Volume.Image != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Image</td>
+    </tr>
+}
+
+@if (Volume.Iscsi != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Iscsi</td>
+    </tr>
+}
+
+@if (Volume.Nfs != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Nfs</td>
+    </tr>
+}
+
+@if (Volume.PersistentVolumeClaim != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>PersistentVolumeClaim</td>
+    </tr>
+    <tr>
+        <td>ClaimName</td>
+        <td>@Volume.PersistentVolumeClaim.ClaimName</td>
+    </tr>
+}
+
+@if (Volume.PhotonPersistentDisk != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>PhotonPersistentDisk</td>
+    </tr>
+}
+
+@if (Volume.PortworxVolume != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>PortworxVolume</td>
+    </tr>
+}
+
+@if (Volume.Projected != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Projected</td>
+    </tr>
+    <tr>
+        <td>Default Mode</td>
+        <td>@Volume.Projected.DefaultMode</td>
+    </tr>
+    <tr>
+        <td>Sources</td>
+        <td>@(Volume.Projected.Sources?.Count() ?? 0)</td>
+    </tr>
+}
+
+@if (Volume.Quobyte != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Quobyte</td>
+    </tr>
+}
+
+@if (Volume.Rbd != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Rbd</td>
+    </tr>
+}
+
+@if (Volume.ScaleIO != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>ScaleIO</td>
+    </tr>
+}
+
+@if (Volume.Secret != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Secret</td>
+    </tr>
+    <tr>
+        <td>Default Mode</td>
+        <td>@Volume.Secret.DefaultMode</td>
+    </tr>
+    <tr>
+        <td>Secret Name</td>
+        <td>@Volume.Secret.SecretName</td>
+    </tr>
+    @foreach (var item in Volume.Secret.Items ?? [])
+    {
+        <tr>
+            <td>@item.Key</td>
+            <td>@item.Path @item.Mode</td>
+        </tr>
+    }
+}
+
+@if (Volume.Storageos != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>Storageos</td>
+    </tr>
+}
+
+@if (Volume.VsphereVolume != null)
+{
+    <tr>
+        <td>Type</td>
+        <td>VsphereVolume</td>
+    </tr>
+}
+
+@code {
+    [Parameter]
+    public required V1Volume Volume { get; set; }
+}

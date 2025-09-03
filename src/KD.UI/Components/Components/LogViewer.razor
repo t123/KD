@@ -1,0 +1,11 @@
+﻿@inherits FluxorComponent
+@inject IJSRuntime jsRuntime
+
+<MudPopover Open="LogViewerState.Value.IsOpen" Fixed="true" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" Class="kd-log-viewer">
+    <MudButton OnClick="CloseViewer">Close</MudButton>
+    <MudElement HtmlTag="div" Style="height: 100%;">
+        <pre style="width: 100%; height: 80%; overflow: scroll">
+            @Value
+        </pre>
+    </MudElement>
+</MudPopover>

@@ -1,0 +1,31 @@
+﻿<DynamicComponent @ref="dc" Type="SelectedType" Parameters="@Parameters" />
+
+@code {
+    Type? SelectedType
+    {
+        get
+        {
+            if (ObjectTypeViewMapping.Map.TryGetValue(Tab.ObjectViewType, out var type) && type.View != null)
+            {
+                return type.View;
+            }
+
+            return typeof(KD.UI.Components.Pages.k8s.EmptyView);
+        }
+    }
+
+    private DynamicComponent? dc;
+
+    Dictionary<string, object> Parameters
+    {
+        get
+        {
+            var d = new Dictionary<string, object>();
+            d.Add("Tab", Tab);
+            return d;
+        }
+    }
+
+    [Parameter]
+    public required TabModel Tab { get; set; }
+}

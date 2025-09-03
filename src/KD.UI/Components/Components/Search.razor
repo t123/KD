@@ -1,0 +1,43 @@
+﻿@inherits FluxorComponent
+@using static KD.Infrastructure.k8s.Fluxor.Misc.SearchViewState
+
+<MudPopover Open="@SearchViewState.Value.IsOpen" Fixed="true" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopLeft" Elevation="10" Square="true" RelativeWidth="DropdownWidth.Relative">
+    <MudStack>
+        <MudElement>
+            <MudTextField Value="@TextValue" ShrinkLabel="true" Label="Search for..." Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" OnKeyUp="KeyUp" ValueChanged="@((e) => TextChanged(e))" T="string" AutoFocus="true"></MudTextField>
+        </MudElement>
+        @if (SearchViewState.Value.Status == SearchStatus.Searching)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (SearchViewState.Value.Status == SearchStatus.Results)
+        {
+            var results = SearchViewState.Value.Results ?? [];
+            <MudTabs Outlined="true" Position="Position.Left">
+                <MudTabPanel Text="@($"All ({results.Length})")">
+                    <MudStack Row="false" Style="width: 100%">
+                        @foreach (var r in results.OrderByDescending(x => x.Score))
+                        {
+                            <SearchResult Result="r" />
+                        }
+                    </MudStack>
+                </MudTabPanel>
+                @foreach (var grouping in results.OrderBy(x => x.NodeTypeAlias).GroupBy(x => x.NodeTypeAlias))
+                {
+                    <MudTabPanel Text="@($"{grouping.Key} ({grouping.Count()})")">
+                        <MudStack Row="false" Style="width: 100%">
+                            @foreach (var r in grouping.OrderBy(x => x.Score))
+                            {
+                                <SearchResult Result="r" />
+                            }
+                        </MudStack>
+                    </MudTabPanel>
+                }
+            </MudTabs>
+        }
+        else if (SearchViewState.Value.Status == SearchStatus.Failure)
+        {
+            <MudText>Oops</MudText>
+        }
+    </MudStack>
+</MudPopover>

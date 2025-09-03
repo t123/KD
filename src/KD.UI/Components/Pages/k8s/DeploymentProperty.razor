@@ -1,0 +1,72 @@
+@inherits BaseProperty
+
+<MudElement HtmlTag="div">
+    @{
+        var deployment = State.Value.Property?.Item?.Deployment;
+
+        if (deployment != null)
+        {
+            <PropertyHeader T="DeploymentPropertyViewModel" ViewModel="State.Value.Property?.Item" />
+            <MudExpansionPanels>
+                <MudExpansionPanel Text="Properties" Expanded="true" Dense="true" Gutters="false" Class="kd-heading">
+                    <MudSimpleTable Dense="true">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>@deployment.Metadata.Name</td>
+                            </tr>
+                            <tr>
+                                <td>Namespace</td>
+                                <td>@deployment.Metadata.NamespaceProperty</td>
+                            </tr>
+                            <tr>
+                                <td>Created</td>
+                                <td>@deployment.Metadata.CreationTimestamp</td>
+                            </tr>
+                            <tr>
+                                <td>Labels</td>
+                                <td><K8sLabels Name="Labels" Labels="@deployment.Metadata.Labels" /></td>
+                            </tr>
+                            <tr>
+                                <td>Annotations</td>
+                                <td><K8sLabels Name="Annotations" Labels="@deployment.Metadata.Annotations" /></td>
+                            </tr>
+                            <tr>
+                                <td>Strategy</td>
+                                <td>@deployment.Spec.Strategy?.Type</td>
+                            </tr>
+                            @if(deployment.Spec.Strategy?.Type=="RollingUpdate")
+                            {
+                                <tr>
+                                    <td>Max Unavailable</td>
+                                    <td>@deployment.Spec.Strategy?.RollingUpdate?.MaxUnavailable</td>
+                                </tr>
+                                <tr>
+                                    <td>Max Surge</td>
+                                    <td>@deployment.Spec.Strategy?.RollingUpdate?.MaxSurge</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td>Replicas</td>
+                                <td>
+                                    @(deployment.Status.Replicas?.ToString() ?? "None") desired<br />
+                                    @(deployment.Status.AvailableReplicas?.ToString() ?? "None") available<br />
+                                    @(deployment.Status.ReadyReplicas?.ToString() ?? "None") ready<br />
+                                    @(deployment.Status.UnavailableReplicas?.ToString() ?? "None") unavailable
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Revision History Limit</td>
+                                <td>@deployment.Spec.RevisionHistoryLimit</td>
+                            </tr>
+                            <tr>
+                                <td>Conditions</td>
+                                <td><K8sConditions Conditions="deployment.Status.Conditions.Select(x => new ConditionViewModel(x.Type, x.Status, x.Reason, x.Message))" /></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        }
+    }
+</MudElement>
